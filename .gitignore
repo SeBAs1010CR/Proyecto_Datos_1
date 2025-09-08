@@ -416,3 +416,5 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+Proyecto_Datos_1.csproj
+Proyecto_Datos_1.sln
