@@ -27,6 +27,32 @@
         }
         return b;
     }
+    public static int NthFibonacci(int n)
+    {
+        // La serie de Risk (2, 3, 5, 8...) corresponde a F(3), F(4), F(5), F(6)...
+        // donde F(0)=0, F(1)=1.
+        
+        // Si el contador es 1 (primer intercambio), queremos el valor 2.
+        // Si el contador es 2, queremos 3.
+        // ... por lo tanto, necesitamos calcular el (n + 2) - ésimo término.
+        int index = n + 2; 
+
+        // Casos base
+        if (index <= 0) return 0;
+        if (index == 1) return 1;
+
+        int a = 0; // F(0)
+        int b = 1; // F(1)
+        int c = 1; // F(2)
+
+        for (int i = 2; i < index; i++)
+        {
+            c = a + b;
+            a = b;
+            b = c;
+        }
+        return c;
+    }
 }
 
 
