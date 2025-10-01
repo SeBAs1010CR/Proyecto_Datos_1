@@ -4,7 +4,7 @@ using System.Windows.Shapes;
 using System.Windows.Media;
 using CrazyRisk.ViewModels;
 using CrazyRisk.Models;
-
+//hola
 namespace CrazyRisk
 {
     public partial class MainWindow : Window
