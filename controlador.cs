@@ -76,41 +76,7 @@ namespace CrazyRisk.ViewModels
             return 0;
         }
 
-        public bool Atacar(Territorio origen, Territorio destino, int tropasAtacantes)
-        {
-            if (origen.Dueño != Actual) return false;
-            if (origen.Tropas <= 1) return false;
-            if (!EsAdyacente(origen, destino)) return false;
 
-            // Simulación de dados
-            var random = new Random();
-            var dadosAtacante = Enumerable.Range(0, Math.Min(3, tropasAtacantes))
-                                          .Select(_ => random.Next(1, 7))
-                                          .OrderByDescending(x => x).ToList();
-
-            var dadosDefensor = Enumerable.Range(0, Math.Min(2, destino.Tropas))
-                                          .Select(_ => random.Next(1, 7))
-                                          .OrderByDescending(x => x).ToList();
-
-            int comparaciones = Math.Min(dadosAtacante.Count, dadosDefensor.Count);
-            for (int i = 0; i < comparaciones; i++)
-            {
-                if (dadosAtacante[i] > dadosDefensor[i])
-                    destino.Tropas--;
-                else
-                    origen.Tropas--;
-            }
-
-            // Conquista
-            if (destino.Tropas <= 0)
-            {
-                destino.Dueño = origen.Dueño;
-                destino.Tropas = tropasAtacantes; // mover tropas mínimas
-                origen.Tropas -= tropasAtacantes;
-            }
-
-            return true;
-        }
 
         public bool EsAdyacente(Territorio a, Territorio b)
         {
