@@ -21,20 +21,24 @@ namespace CrazyRisk.Models
         }
     }
 
+
     public class Territorio
-    {
+    { // agregue continente en esta clase, ate dilan
         public string Nombre { get; set; }
+        public string Continente { get; set; } // agregue continente
         public Jugador? Dueño { get; set; }
         public int Tropas { get; set; }
         public Lista<Territorio> Adyacentes { get; set; }
 
-        public Territorio(string nombre)
+        public Territorio(string nombre, string continente)
         {
             Nombre = nombre;
-            Tropas = 1;
+            Continente = continente; // Asignamos el continente
+            Tropas = 1; // Tropas iniciales
             Adyacentes = new Lista<Territorio>();
         }
     }
+
 
     public class Tarjeta
     {
