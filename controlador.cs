@@ -8,6 +8,8 @@ namespace CrazyRisk.ViewModels
         public Jugador Jugador1 { get; private set; }
         public Jugador Jugador2 { get; private set; }
         // Contador para seguir la secuencia de refuerzo: 1er intercambio = 2, 2do = 3, etc.
+
+        public Jugador Neutro { get; private set; } //jugador neutro que hice para los territorios, atte dilan
         private int ContadorGlobalIntercambios = 1; 
 
         public Jugador Actual { get; private set; } = null!;
@@ -35,6 +37,7 @@ namespace CrazyRisk.ViewModels
             Mapa = new Mapa();
             Jugador1 = new Jugador("Player 1", "Azul");
             Jugador2 = new Jugador("Player 2", "Rojo");
+            Neutro = new Jugador("Neutro", "Gris");
 
             InicializarMapa();
         }
@@ -104,14 +107,87 @@ namespace CrazyRisk.ViewModels
     //uuh
 
         private void InicializarMapa()
+        //DILAN
         {
-            // Ejemplo básico (luego debes expandir a los 42 territorios)
-            var usa = new Territorio("Estados Unidos") { Dueño = Jugador1, Tropas = 5 };
-            var canada = new Territorio("Canada") { Dueño = Jugador2, Tropas = 3 };
-            var mexico = new Territorio("Mexico") { Dueño = Jugador1, Tropas = 2 };
-            Mapa.AgregarTerritorio(usa);
-            Mapa.AgregarTerritorio(canada);
+            //  lista de 42 territorios con sus continentes
+            var territorios = new List<Territorio>
+            {
+                // América del Norte (9)
+                new Territorio("Alaska", "América del Norte"),
+                new Territorio("Territorio del Noroeste", "América del Norte"),
+                new Territorio("Groenlandia", "América del Norte"),
+                new Territorio("Alberta", "América del Norte"),
+                new Territorio("Ontario", "América del Norte"),
+                new Territorio("Quebec", "América del Norte"),
+                new Territorio("Oeste de EE.UU.", "América del Norte"),
+                new Territorio("Este de EE.UU.", "América del Norte"),
+                new Territorio("México", "América del Norte"),
+
+                // América del Sur (4)
+                new Territorio("Venezuela", "América del Sur"),
+                new Territorio("Perú", "América del Sur"),
+                new Territorio("Brasil", "América del Sur"),
+                new Territorio("Argentina", "América del Sur"),
+
+                // Europa (7)
+                new Territorio("Islandia", "Europa"),
+                new Territorio("Escandinavia", "Europa"),
+                new Territorio("Gran Bretaña", "Europa"),
+                new Territorio("Europa Occidental", "Europa"),
+                new Territorio("Europa del Sur", "Europa"),
+                new Territorio("Europa del Norte", "Europa"),
+                new Territorio("Ucrania", "Europa"),
+
+                // África (6)
+                new Territorio("África del Norte", "África"),
+                new Territorio("Egipto", "África"),
+                new Territorio("Congo", "África"),
+                new Territorio("África Oriental", "África"),
+                new Territorio("África del Sur", "África"),
+                new Territorio("Madagascar", "África"),
+
+                // Asia (12)
+                new Territorio("Ural", "Asia"),
+                new Territorio("Siberia", "Asia"),
+                new Territorio("Yakutsk", "Asia"),
+                new Territorio("Kamchatka", "Asia"),
+                new Territorio("Irkutsk", "Asia"),
+                new Territorio("Mongolia", "Asia"),
+                new Territorio("Japón", "Asia"),
+                new Territorio("China", "Asia"),
+                new Territorio("India", "Asia"),
+                new Territorio("Afganistán", "Asia"),
+                new Territorio("Medio Oriente", "Asia"),
+                new Territorio("Siam", "Asia"),
+
+                // Oceanía (4)
+                new Territorio("Indonesia", "Oceanía"),
+                new Territorio("Nueva Guinea", "Oceanía"),
+                new Territorio("Australia Occidental", "Oceanía"),
+                new Territorio("Australia Oriental", "Oceanía")
+            };
+
+            // 2. Mezclar aleatoriamente
+            var random = new Random();
+            territorios = territorios.OrderBy(t => random.Next()).ToList();
+
+            // 3. Repartir entre Jugador1, Jugador2 y Neutro
+            int index = 0;
+            foreach (var territorio in territorios)
+            {
+                if (index % 3 == 0)
+                    territorio.Dueño = Jugador1;
+                else if (index % 3 == 1)
+                    territorio.Dueño = Jugador2;
+                else
+                    territorio.Dueño = Neutro;
+
+                territorio.Tropas = 1; // Tropas iniciales
+                Mapa.AgregarTerritorio(territorio);
+                index++;
+            }
         }
+
         // Mazo global de donde se sacan las tarjetas.
         private Lista<Tarjeta> MazoDeTarjetas { get; set; } = new Lista<Tarjeta>();
         
@@ -286,6 +362,7 @@ namespace CrazyRisk.ViewModels
 
         // Maes esta es la funcion de ataque 
         public (bool conquista, int bajasAtk, int bajasDef, bool victoria) ProcesarAtaque(
+            //DILAN
             Territorio origen,
             Territorio destino,
             int dadosAtacante,
