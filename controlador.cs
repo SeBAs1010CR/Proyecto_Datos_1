@@ -73,11 +73,48 @@ namespace CrazyRisk.ViewModels
             return count;
         }
 
+        // Calcula el bonus de refuerzos que obtiene un jugador por controlar continentes completos.
+
         private int CalcularBonusContinente(Jugador j)
         {
-            // Aquí defines los continentes y verificas si j controla todos los territorios del continente
-            // Por ahora devuelvo 0 como placeholder
-            return 0;
+            // Definimos un diccionario donde cada continente tiene:
+            // - Un valor de bonus (tropas extra)
+            // - Un arreglo con los nombres de los territorios que lo componen
+            var continentes = new Dictionary<string, (int bonus, string[] territorios)>
+            {
+                { "América del Norte", (5, new[] { "Alaska", "Territorio del Noroeste", "Groenlandia", "Alberta", "Ontario", "Quebec", "Oeste de EE.UU.", "Este de EE.UU.", "México" }) },
+                { "América del Sur", (2, new[] { "Venezuela", "Perú", "Brasil", "Argentina" }) },
+                { "Europa", (5, new[] { "Islandia", "Escandinavia", "Gran Bretaña", "Europa Occidental", "Europa del Sur", "Europa del Norte", "Ucrania" }) },
+                { "África", (3, new[] { "África del Norte", "Egipto", "Congo", "África Oriental", "África del Sur", "Madagascar" }) },
+                { "Asia", (7, new[] { "Ural", "Siberia", "Yakutsk", "Kamchatka", "Irkutsk", "Mongolia", "Japón", "China", "India", "Afganistán", "Medio Oriente", "Siam" }) },
+                { "Oceanía", (2, new[] { "Indonesia", "Nueva Guinea", "Australia Occidental", "Australia Oriental" }) }
+            };
+
+            int bonus = 0; // Acumulador para el total de tropas extra
+
+            // Recorremos cada continente para verificar si el jugador controla todos sus territorios
+            foreach (var continente in continentes)
+            {
+                bool controlaTodo = true; // Asumimos que sí controla todo hasta que se demuestre lo contrario
+
+                // Recorremos los territorios del continente actual
+                foreach (var nombreTerritorio in continente.Value.territorios)
+                {
+                    var territorio = GetTerritorio(nombreTerritorio); // Buscamos el territorio en el mapa
+                    // Si el territorio no existe o no pertenece al jugador, no controla el continente
+                    if (territorio == null || territorio.Dueño != j)
+                    {
+                        controlaTodo = false;
+                        break; // Salimos del bucle porque ya sabemos que no controla todo
+                    }
+                }
+
+                // Si controla todos los territorios del continente, sumamos el bonus correspondiente
+                if (controlaTodo)
+                    bonus += continente.Value.bonus;
+            }
+
+            return bonus; // Devolvemos el total de tropas extra por continentes controlados
         }
 
 
