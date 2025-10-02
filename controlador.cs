@@ -18,6 +18,7 @@ namespace CrazyRisk.ViewModels
         private int turno;
         //Sebas
         // Método que la UI llamará para obtener el valor del refuerzo
+        //En la UI permitir que los jugadores coloquen una tropa por turno en un territorio propio hasta que TropasDisponibles == 0.
         public int ObtenerValorRefuerzoPorIntercambio()
         {
             // 1. Obtener el valor de la serie basado en el contador actual.
@@ -104,8 +105,20 @@ namespace CrazyRisk.ViewModels
             }
             return true;
         }
-        //uuh
+        
+        public void PrepararRefuerzosIniciales()
+        //Dilan
+        {
+            int tropasIniciales = 40;
+            int territoriosJ1 = ContarTerritorios(Jugador1);
+            int territoriosJ2 = ContarTerritorios(Jugador2);
 
+            Jugador1.TropasDisponibles = tropasIniciales - territoriosJ1;
+            Jugador2.TropasDisponibles = tropasIniciales - territoriosJ2;
+
+            // El jugador neutro no coloca tropas manualmente, se puede distribuir aleatoriamente
+        }
+        //Necesito que en 
         private void InicializarMapa()
         //DILAN
         {
@@ -186,7 +199,7 @@ namespace CrazyRisk.ViewModels
                 Mapa.AgregarTerritorio(territorio);
                 index++;
             }
-             // Crew dicionario para acceder rapido, atte, dilan
+            // Crew dicionario para acceder rapido, atte, dilan
             var mapaDict = territorios.ToDictionary(t => t.Nombre);
 
             // === América del Norte ===
@@ -251,7 +264,7 @@ namespace CrazyRisk.ViewModels
             mapaDict["Argentina"].Adyacentes.Agregar(mapaDict["Perú"]);
             mapaDict["Argentina"].Adyacentes.Agregar(mapaDict["Brasil"]);
 
-             // === Europa ===
+            // === Europa ===
             mapaDict["Islandia"].Adyacentes.Agregar(mapaDict["Groenlandia"]);
             mapaDict["Islandia"].Adyacentes.Agregar(mapaDict["Gran Bretaña"]);
             mapaDict["Islandia"].Adyacentes.Agregar(mapaDict["Escandinavia"]);
