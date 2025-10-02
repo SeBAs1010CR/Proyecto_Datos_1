@@ -101,7 +101,7 @@ namespace CrazyRisk.ViewModels
             }
             return true;
         }
-    
+    //uuh
 
         private void InicializarMapa()
         {
@@ -283,54 +283,73 @@ namespace CrazyRisk.ViewModels
         /// <param name="destino">Territorio atacado.</param>
         /// <param name="dadosAtacante">Número de dados del atacante (1-3).</param>
         /// <param name="tropasAUsar">Número total de tropas a comprometer en el ataque (incluye las de los dados).</param>
-        public (bool conquista, int bajasAtk, int bajasDef) ProcesarAtaque(Territorio origen, Territorio destino, int dadosAtacante)
+
+        // Maes esta es la funcion de ataque 
+        public (bool conquista, int bajasAtk, int bajasDef, bool victoria) ProcesarAtaque(
+            Territorio origen,
+            Territorio destino,
+            int dadosAtacante,
+            int tropasAMover // nuevo parámetro: tropas que el jugador quiere mover al conquistar
+        )
         {
-            // === REGLA 1: VALIDACIÓN ===
-            // 1. Verificar Dueño y Tropas mínimas
-            if (origen.Dueño == destino.Dueño || origen.Tropas < 2)
-                return (false, 0, 0); // Validación fallida
+            //Validaciones
+            // Verifica que sea el turno del jugador que ataca
+            if (Actual != origen.Dueño) return (false, 0, 0, false); // No es su turno
+            
+            // Verifica que no se ataque a un territorio propio y que haya al menos 2 tropas
+            if (origen.Dueño == destino.Dueño || origen.Tropas < 2) return (false, 0, 0, false);
 
-            // 2. Verificar Adyacencia (Asumimos que EsAdyacente ya está implementado en clases.cs)
-            if (!EsAdyacente(origen, destino))
-                return (false, 0, 0); // Validación fallida
+            // Verifica que los territorios sean adyacentes
+            if (!EsAdyacente(origen, destino)) return (false, 0, 0, false);
 
-            // 3. Limitar dadosAtacante y dadosDefensor
-            dadosAtacante = Math.Min(dadosAtacante, origen.Tropas - 1); // Siempre debe dejar 1 en origen
-            int dadosDefensor = Math.Min(destino.Tropas, 2); // Máximo 2 dados
+            // Limitar dados y tropas
+            dadosAtacante = Math.Min(dadosAtacante, origen.Tropas - 1);
+            int dadosDefensor = Math.Min(destino.Tropas, 2);
 
-            // === REGLA 2: RESOLUCIÓN DE COMBATE ===
+            // COMBATE 
+            //Simula el combate y obtiene las pérdidas de ambos jugadores
             var (perdidasAtk, perdidasDef) = ResolverCombate(dadosAtacante, dadosDefensor);
+            origen.Tropas -= perdidasAtk;// Aplica las pérdidas
+            destino.Tropas -= perdidasDef;// Aplica las pérdidas
 
-            // Aplicar pérdidas
-            origen.Tropas -= perdidasAtk;
-            destino.Tropas -= perdidasDef;
-
-            // === REGLA 3: CONQUISTA ===
             bool conquistado = false;
+            bool victoria = false;
+
             if (destino.Tropas <= 0)
             {
                 conquistado = true;
-                
-                // 1. Cambiar dueño y color
-                destino.Dueño = origen.Dueño;
+                destino.Dueño = origen.Dueño; // Cambia el dueño del territorio conquistado
 
-                // 2. Mover tropas MÍNIMAS (tantas como dados se usaron en el ataque ganador)
-                // El requisito es que el atacante mueva AL MENOS tantos ejércitos como dados usó.
-                // Aquí solo movemos el mínimo; la UI debe pedir al jugador cuántas quiere mover.
-                int tropasMovidasMinimo = dadosAtacante; 
-                
-                destino.Tropas = tropasMovidasMinimo;
-                origen.Tropas -= tropasMovidasMinimo;
+                // Validar tropas a mover
+                int minimoAMover = dadosAtacante; // Calcula el mínimo de tropas que se deben mover (igual a los dados usados)
+                tropasAMover = Math.Max(tropasAMover, minimoAMover);
+                tropasAMover = Math.Min(tropasAMover, origen.Tropas - 1); // Siempre debe quedar 1
 
-                // Lógica de Tarjetas: Si se conquista, se asigna una tarjeta
-                AsignarTarjetaAlJugador(origen.Dueño!); // Llama al método implementado previamente
-                
-                // Lógica de Comms: Notificar a todos que el territorio cambió de dueño.
+                destino.Tropas = tropasAMover; // Mueve las tropas al territorio conquistado
+                origen.Tropas -= tropasAMover;
+
+                // Asignar tarjeta
+                AsignarTarjetaAlJugador(origen.Dueño); // Asigna una tarjeta al jugador por conquistar territorio
+
+                // Verificar victoria
+                if (HaGanado(origen.Dueño))
+                {
+                    victoria = true;
+                    // Aquí podriamos notificar a los jugadores que el juego terminó
+                }
+
+                // Notificación poara la vara del OTP
+                // EnviarMensajeAClientes(new {
+                //     tipo = "conquista",
+                //     territorio = destino.Nombre,
+                //     nuevoDueno = origen.Dueño.Alias,
+                //     tropas = destino.Tropas
+                // });
             }
-            
-            // Devolver el resultado de las bajas y si hubo conquista (útil para la UI)
-            return (conquistado, perdidasAtk, perdidasDef);
+            // Devuelve los resultados del ataque, util para la UI q hizo ALI
+            return (conquistado, perdidasAtk, perdidasDef, victoria);
         }
+
         public Territorio? GetTerritorio(string nombre) =>
             Mapa.BuscarTerritorio(nombre);
     }
