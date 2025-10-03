@@ -703,7 +703,7 @@ namespace CrazyRisk.ViewModels
             destino.Tropas += cantidad;
             return true;
         }
-
+        //Dilan
         // Verifica si hay ruta entre dos territorios del mismo jugador
         private bool ExisteRutaEntre(Territorio origen, Territorio destino, Jugador jugador)
         {
