@@ -10,11 +10,11 @@ namespace CrazyRisk.ViewModels
         // Contador para seguir la secuencia de refuerzo: 1er intercambio = 2, 2do = 3, etc.
 
         public Jugador Neutro { get; private set; } //jugador neutro que hice para los territorios, atte dilan
-        private int ContadorGlobalIntercambios = 1; 
+        private int ContadorGlobalIntercambios = 1;
 
         public Jugador Actual { get; private set; } = null!;
 
-  
+
         private int turno;
         //Sebas
         // Método que la UI llamará para obtener el valor del refuerzo
@@ -142,7 +142,7 @@ namespace CrazyRisk.ViewModels
             }
             return true;
         }
-        
+
         public void PrepararRefuerzosIniciales()
         //Dilan
         {
@@ -453,7 +453,7 @@ namespace CrazyRisk.ViewModels
 
         // Mazo global de donde se sacan las tarjetas.
         private Lista<Tarjeta> MazoDeTarjetas { get; set; } = new Lista<Tarjeta>();
-        
+
 
 
 
@@ -466,11 +466,11 @@ namespace CrazyRisk.ViewModels
             {
                 // Llamamos al método Remover implementado en Lista<T>
                 jugador.Tarjetas.Remover(nodoTrio.Valor);
-                
+
                 // El requisito original de RISK es devolver las tarjetas al mazo,
                 // pero dado el requisito de 'tarjetas por territorio' y la mecánica de Fibonacci,
                 // simplemente las removemos. Si quieres devolverlas, agrégalas al MazoDeTarjetas aquí.
-                
+
                 nodoTrio = nodoTrio.Siguiente;
             }
         }
@@ -521,7 +521,7 @@ namespace CrazyRisk.ViewModels
             for (int i = 0; i < 14; i++) MazoDeTarjetas.Agregar(new Tarjeta("Artillería"));
 
             // 2. Barajar la lista (necesitas un método de barajado en tu Lista o mover los Nodos de forma pseudo-aleatoria)
-            MazoDeTarjetas.Aleatorio();  
+            MazoDeTarjetas.Aleatorio();
         }
         // Fragmento de la Lógica de Ataque en GameController (o una nueva función)
         public void AsignarTarjetaAlJugador(Jugador jugador)
@@ -548,10 +548,10 @@ namespace CrazyRisk.ViewModels
             if (EsTrioValido(trio))
             {
                 // 1. Obtener el valor del refuerzo para ESTE intercambio
-                int refuerzo = ObtenerValorRefuerzoPorIntercambio(); 
+                int refuerzo = ObtenerValorRefuerzoPorIntercambio();
 
                 // 2. Aplicar el cambio de estado global: ¡Muy importante!
-                IncrementarContadorIntercambio(); 
+                IncrementarContadorIntercambio();
 
                 // 3. Eliminar el trío de la mano del jugador
                 EliminarTrioDeLaMano(jugador, trio);
@@ -560,7 +560,7 @@ namespace CrazyRisk.ViewModels
                 if (jugador.DebeIntercambiarTarjetas)
                 {
                     // Asumimos que un solo intercambio de trío es suficiente para cumplir el requisito.
-                    jugador.DebeIntercambiarTarjetas = false; 
+                    jugador.DebeIntercambiarTarjetas = false;
                 }
                 // 5. Asignar las tropas de refuerzo al jugador.
                 jugador.TropasDisponibles += refuerzo;
@@ -592,7 +592,7 @@ namespace CrazyRisk.ViewModels
 
             // 2. Ordenar de Mayor a Menor (Descendente)
             // Se usa Array.Sort para el ordenamiento interno del array (rápido y simple)
-            Array.Sort(atk, (a, b) => b.CompareTo(a)); 
+            Array.Sort(atk, (a, b) => b.CompareTo(a));
             Array.Sort(def, (a, b) => b.CompareTo(a));
 
             int perdidasAtk = 0;
@@ -635,7 +635,7 @@ namespace CrazyRisk.ViewModels
             //Validaciones
             // Verifica que sea el turno del jugador que ataca
             if (Actual != origen.Dueño) return (false, 0, 0, false); // No es su turno
-            
+
             // Verifica que no se ataque a un territorio propio y que haya al menos 2 tropas
             if (origen.Dueño == destino.Dueño || origen.Tropas < 2) return (false, 0, 0, false);
 
@@ -692,5 +692,107 @@ namespace CrazyRisk.ViewModels
 
         public Territorio? GetTerritorio(string nombre) =>
             Mapa.BuscarTerritorio(nombre);
+        // Mueve tropas entre territorios propios
+        public bool MoverTropas(Territorio origen, Territorio destino, int cantidad)
+        {
+            if (origen.Dueño != Actual || destino.Dueño != Actual) return false;
+            if (!ExisteRutaEntre(origen, destino, Actual)) return false;
+            if (cantidad <= 0 || origen.Tropas <= cantidad) return false;
+
+            origen.Tropas -= cantidad;
+            destino.Tropas += cantidad;
+            return true;
+        }
+
+        // Verifica si hay ruta entre dos territorios del mismo jugador
+        private bool ExisteRutaEntre(Territorio origen, Territorio destino, Jugador jugador)
+        {
+            var visitados = new HashSet<Territorio>();
+            var cola = new Queue<Territorio>();
+            cola.Enqueue(origen);
+
+            while (cola.Count > 0)
+            {
+                var actual = cola.Dequeue();
+                if (actual == destino) return true;
+                visitados.Add(actual);
+
+                var nodo = actual.Adyacentes.ObtenerCabeza();
+                while (nodo != null)
+                {
+                    var vecino = nodo.Valor;
+                    if (vecino.Dueño == jugador && !visitados.Contains(vecino))
+                        cola.Enqueue(vecino);
+                    nodo = nodo.Siguiente;
+                }
+            }
+            return false;
+        }
+
+        // Coloca tropas restantes del jugador neutro aleatoriamente
+        public void DistribuirTropasNeutro()
+        {
+            int restantes = 40 - ContarTerritorios(Neutro);
+            var territoriosNeutros = new List<Territorio>();
+            var nodo = Mapa.Territorios.ObtenerCabeza();
+            while (nodo != null)
+            {
+                if (nodo.Valor.Dueño == Neutro)
+                    territoriosNeutros.Add(nodo.Valor);
+                nodo = nodo.Siguiente;
+            }
+
+            var rand = new Random();
+            while (restantes > 0)
+            {
+                var territorio = territoriosNeutros[rand.Next(territoriosNeutros.Count)];
+                territorio.Tropas++;
+                restantes--;
+            }
+        }
+
+        // Baraja el mazo de tarjetas manualmente
+        public void BarajarMazo()
+        {
+            var tarjetas = new List<Tarjeta>();
+            var nodo = MazoDeTarjetas.ObtenerCabeza();
+            while (nodo != null)
+            {
+                tarjetas.Add(nodo.Valor);
+                nodo = nodo.Siguiente;
+            }
+
+            var rand = new Random();
+            tarjetas = tarjetas.OrderBy(t => rand.Next()).ToList();
+
+            MazoDeTarjetas = new Lista<Tarjeta>();
+            foreach (var tarjeta in tarjetas)
+                MazoDeTarjetas.Agregar(tarjeta);
+        }
+
+        // Asigna tarjeta con nombre del territorio (opcional)
+        public void AsignarTarjetaPorTerritorio(Jugador jugador, string nombreTerritorio)
+        {
+            if (!MazoDeTarjetas.EstaVacia())
+            {
+                Tarjeta tarjeta = MazoDeTarjetas.SacarDelFrente();
+                tarjeta.Tipo += $" - {nombreTerritorio}";
+                jugador.Tarjetas.Agregar(tarjeta);
+            }
+        }
+
+// Activa tercer jugador como reemplazo del neutro
+        public void ActivarTercerJugador(string alias, string color)
+        {
+            Neutro = new Jugador(alias, color);
+            var nodo = Mapa.Territorios.ObtenerCabeza();
+            while (nodo != null)
+            {
+                if (nodo.Valor.Dueño.Alias == "Neutro")
+                    nodo.Valor.Dueño = Neutro;
+                nodo = nodo.Siguiente;
+            }
+        }
     }
+    
 }
