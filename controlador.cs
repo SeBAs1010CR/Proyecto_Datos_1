@@ -164,61 +164,52 @@ namespace CrazyRisk.ViewModels
             //  lista de 42 territorios con sus continentes
             var territorios = new List<Territorio>
             {
-                // América del Norte (9)
-                new Territorio("Alaska", "América del Norte"),
-                new Territorio("Territorio del Noroeste", "América del Norte"),
-                new Territorio("Groenlandia", "América del Norte"),
-                new Territorio("Alberta", "América del Norte"),
-                new Territorio("Ontario", "América del Norte"),
-                new Territorio("Quebec", "América del Norte"),
-                new Territorio("Oeste de EE.UU.", "América del Norte"),
-                new Territorio("Este de EE.UU.", "América del Norte"),
-                new Territorio("México", "América del Norte"),
-
-                // América del Sur (4)
-                new Territorio("Venezuela", "América del Sur"),
-                new Territorio("Perú", "América del Sur"),
-                new Territorio("Brasil", "América del Sur"),
-                new Territorio("Argentina", "América del Sur"),
-
-                // Europa (7)
+                new Territorio("Estados_Unidos", "America"),
+                new Territorio("Canada", "America"),
+                new Territorio("Alaska", "America"),
+                new Territorio("Mexico", "America"),
+                new Territorio("Dinamarca", "Europa"),
+                new Territorio("Guatemala", "America"),
+                new Territorio("Belice", "America"),
+                new Territorio("El_Salvador", "America"),
+                new Territorio("Honduras", "America"),
+                new Territorio("Nicaragua", "America"),
+                new Territorio("Costa_Rica", "America"),
+                new Territorio("Panama", "America"),
+                new Territorio("Colombia", "America"),
+                new Territorio("Venezuela", "America"),
+                new Territorio("Ecuador", "America"),
+                new Territorio("Peru", "America"),
+                new Territorio("Brasil", "America"),
+                new Territorio("Guyana_Francesa", "America"),
+                new Territorio("Guyana", "America"),
+                new Territorio("Suriname", "America"),
+                new Territorio("Bolivia", "America"),
+                new Territorio("Paraguay", "America"),
+                new Territorio("Chile", "America"),
+                new Territorio("Argentina", "America"),
+                new Territorio("Uruguay", "America"),
+                new Territorio("Cuba", "America"),
+                new Territorio("Jamaica", "America"),
+                new Territorio("Haiti", "America"),
+                new Territorio("Republica_Dominicana", "America"),
+                new Territorio("Puerto_Rico", "America"),
                 new Territorio("Islandia", "Europa"),
-                new Territorio("Escandinavia", "Europa"),
-                new Territorio("Gran Bretaña", "Europa"),
-                new Territorio("Europa Occidental", "Europa"),
-                new Territorio("Europa del Sur", "Europa"),
-                new Territorio("Europa del Norte", "Europa"),
-                new Territorio("Ucrania", "Europa"),
-
-                // África (6)
-                new Territorio("África del Norte", "África"),
-                new Territorio("Egipto", "África"),
-                new Territorio("Congo", "África"),
-                new Territorio("África Oriental", "África"),
-                new Territorio("África del Sur", "África"),
-                new Territorio("Madagascar", "África"),
-
-                // Asia (12)
-                new Territorio("Ural", "Asia"),
-                new Territorio("Siberia", "Asia"),
-                new Territorio("Yakutsk", "Asia"),
-                new Territorio("Kamchatka", "Asia"),
-                new Territorio("Irkutsk", "Asia"),
-                new Territorio("Mongolia", "Asia"),
-                new Territorio("Japón", "Asia"),
+                new Territorio("Rusia", "Asia"),
                 new Territorio("China", "Asia"),
+                new Territorio("Indonesia", "Asia"),
+                new Territorio("Mongolia", "Asia"),
                 new Territorio("India", "Asia"),
-                new Territorio("Afganistán", "Asia"),
-                new Territorio("Medio Oriente", "Asia"),
-                new Territorio("Siam", "Asia"),
-
-                // Oceanía (4)
-                new Territorio("Indonesia", "Oceanía"),
-                new Territorio("Nueva Guinea", "Oceanía"),
-                new Territorio("Australia Occidental", "Oceanía"),
-                new Territorio("Australia Oriental", "Oceanía")
+                new Territorio("Australia", "Oceania"),
+                new Territorio("Arabia_Saudita", "Asia"),
+                new Territorio("Europa_1", "Europa"),
+                new Territorio("Europa_2", "Europa"),
+                new Territorio("Turquia", "Europa"),
+                new Territorio("Asia_1", "Asia"),
+                new Territorio("Africa_1", "Africa"),
+                new Territorio("Africa_2", "Africa"),
+                new Territorio("TEC", "Especial")
             };
-
             // 2. Mezclar aleatoriamente
             var random = new Random();
             territorios = territorios.OrderBy(t => random.Next()).ToList();
@@ -241,216 +232,32 @@ namespace CrazyRisk.ViewModels
             // Crew dicionario para acceder rapido, atte, dilan
             var mapaDict = territorios.ToDictionary(t => t.Nombre);
 
-            // === América del Norte ===
-            mapaDict["Alaska"].Adyacentes.Agregar(mapaDict["Territorio del Noroeste"]);
-            mapaDict["Alaska"].Adyacentes.Agregar(mapaDict["Alberta"]);
-            mapaDict["Alaska"].Adyacentes.Agregar(mapaDict["Kamchatka"]);
+            
 
-            mapaDict["Territorio del Noroeste"].Adyacentes.Agregar(mapaDict["Alaska"]);
-            mapaDict["Territorio del Noroeste"].Adyacentes.Agregar(mapaDict["Alberta"]);
-            mapaDict["Territorio del Noroeste"].Adyacentes.Agregar(mapaDict["Ontario"]);
-            mapaDict["Territorio del Noroeste"].Adyacentes.Agregar(mapaDict["Groenlandia"]);
+            // América Central
+            mapaDict["Mexico"].Adyacentes.Agregar(mapaDict["Estados_Unidos"]);
+            mapaDict["Mexico"].Adyacentes.Agregar(mapaDict["Guatemala"]);
+            mapaDict["Guatemala"].Adyacentes.Agregar(mapaDict["Belice"]);
+            mapaDict["Guatemala"].Adyacentes.Agregar(mapaDict["El_Salvador"]);
+            mapaDict["El_Salvador"].Adyacentes.Agregar(mapaDict["Honduras"]);
+            mapaDict["Honduras"].Adyacentes.Agregar(mapaDict["Nicaragua"]);
+            mapaDict["Nicaragua"].Adyacentes.Agregar(mapaDict["Costa_Rica"]);
+            mapaDict["Costa_Rica"].Adyacentes.Agregar(mapaDict["Panama"]);
+            mapaDict["Panama"].Adyacentes.Agregar(mapaDict["Colombia"]);
 
-            mapaDict["Groenlandia"].Adyacentes.Agregar(mapaDict["Territorio del Noroeste"]);
-            mapaDict["Groenlandia"].Adyacentes.Agregar(mapaDict["Ontario"]);
-            mapaDict["Groenlandia"].Adyacentes.Agregar(mapaDict["Quebec"]);
-            mapaDict["Groenlandia"].Adyacentes.Agregar(mapaDict["Islandia"]);
+            // América del Sur
+            mapaDict["Colombia"].Adyacentes.Agregar(mapaDict["Venezuela"]);
+            mapaDict["Colombia"].Adyacentes.Agregar(mapaDict["Ecuador"]);
+            mapaDict["Ecuador"].Adyacentes.Agregar(mapaDict["Peru"]);
+            mapaDict["Peru"].Adyacentes.Agregar(mapaDict["Brasil"]);
+            mapaDict["Brasil"].Adyacentes.Agregar(mapaDict["Bolivia"]);
+            mapaDict["Bolivia"].Adyacentes.Agregar(mapaDict["Paraguay"]);
+            mapaDict["Paraguay"].Adyacentes.Agregar(mapaDict["Argentina"]);
+            mapaDict["Argentina"].Adyacentes.Agregar(mapaDict["Chile"]);
+            mapaDict["Argentina"].Adyacentes.Agregar(mapaDict["Uruguay"]);
 
-            mapaDict["Alberta"].Adyacentes.Agregar(mapaDict["Alaska"]);
-            mapaDict["Alberta"].Adyacentes.Agregar(mapaDict["Territorio del Noroeste"]);
-            mapaDict["Alberta"].Adyacentes.Agregar(mapaDict["Ontario"]);
-            mapaDict["Alberta"].Adyacentes.Agregar(mapaDict["Oeste de EE.UU."]);
-
-            mapaDict["Ontario"].Adyacentes.Agregar(mapaDict["Territorio del Noroeste"]);
-            mapaDict["Ontario"].Adyacentes.Agregar(mapaDict["Groenlandia"]);
-            mapaDict["Ontario"].Adyacentes.Agregar(mapaDict["Quebec"]);
-            mapaDict["Ontario"].Adyacentes.Agregar(mapaDict["Este de EE.UU."]);
-            mapaDict["Ontario"].Adyacentes.Agregar(mapaDict["Oeste de EE.UU."]);
-            mapaDict["Ontario"].Adyacentes.Agregar(mapaDict["Alberta"]);
-
-            mapaDict["Quebec"].Adyacentes.Agregar(mapaDict["Groenlandia"]);
-            mapaDict["Quebec"].Adyacentes.Agregar(mapaDict["Ontario"]);
-            mapaDict["Quebec"].Adyacentes.Agregar(mapaDict["Este de EE.UU."]);
-
-            mapaDict["Oeste de EE.UU."].Adyacentes.Agregar(mapaDict["Alberta"]);
-            mapaDict["Oeste de EE.UU."].Adyacentes.Agregar(mapaDict["Ontario"]);
-            mapaDict["Oeste de EE.UU."].Adyacentes.Agregar(mapaDict["Este de EE.UU."]);
-            mapaDict["Oeste de EE.UU."].Adyacentes.Agregar(mapaDict["México"]);
-
-            mapaDict["Este de EE.UU."].Adyacentes.Agregar(mapaDict["Ontario"]);
-            mapaDict["Este de EE.UU."].Adyacentes.Agregar(mapaDict["Quebec"]);
-            mapaDict["Este de EE.UU."].Adyacentes.Agregar(mapaDict["Oeste de EE.UU."]);
-            mapaDict["Este de EE.UU."].Adyacentes.Agregar(mapaDict["México"]);
-
-            mapaDict["México"].Adyacentes.Agregar(mapaDict["Oeste de EE.UU."]);
-            mapaDict["México"].Adyacentes.Agregar(mapaDict["Este de EE.UU."]);
-            mapaDict["México"].Adyacentes.Agregar(mapaDict["Venezuela"]);
-
-            // === América del Sur ===
-            mapaDict["Venezuela"].Adyacentes.Agregar(mapaDict["México"]);
-            mapaDict["Venezuela"].Adyacentes.Agregar(mapaDict["Brasil"]);
-            mapaDict["Venezuela"].Adyacentes.Agregar(mapaDict["Perú"]);
-
-            mapaDict["Perú"].Adyacentes.Agregar(mapaDict["Venezuela"]);
-            mapaDict["Perú"].Adyacentes.Agregar(mapaDict["Brasil"]);
-            mapaDict["Perú"].Adyacentes.Agregar(mapaDict["Argentina"]);
-
-            mapaDict["Brasil"].Adyacentes.Agregar(mapaDict["Venezuela"]);
-            mapaDict["Brasil"].Adyacentes.Agregar(mapaDict["Perú"]);
-            mapaDict["Brasil"].Adyacentes.Agregar(mapaDict["Argentina"]);
-            mapaDict["Brasil"].Adyacentes.Agregar(mapaDict["África del Norte"]);
-
-            mapaDict["Argentina"].Adyacentes.Agregar(mapaDict["Perú"]);
-            mapaDict["Argentina"].Adyacentes.Agregar(mapaDict["Brasil"]);
-
-            // === Europa ===
-            mapaDict["Islandia"].Adyacentes.Agregar(mapaDict["Groenlandia"]);
-            mapaDict["Islandia"].Adyacentes.Agregar(mapaDict["Gran Bretaña"]);
-            mapaDict["Islandia"].Adyacentes.Agregar(mapaDict["Escandinavia"]);
-
-            mapaDict["Escandinavia"].Adyacentes.Agregar(mapaDict["Islandia"]);
-            mapaDict["Escandinavia"].Adyacentes.Agregar(mapaDict["Gran Bretaña"]);
-            mapaDict["Escandinavia"].Adyacentes.Agregar(mapaDict["Europa del Norte"]);
-            mapaDict["Escandinavia"].Adyacentes.Agregar(mapaDict["Ucrania"]);
-
-            mapaDict["Gran Bretaña"].Adyacentes.Agregar(mapaDict["Islandia"]);
-            mapaDict["Gran Bretaña"].Adyacentes.Agregar(mapaDict["Escandinavia"]);
-            mapaDict["Gran Bretaña"].Adyacentes.Agregar(mapaDict["Europa Occidental"]);
-            mapaDict["Gran Bretaña"].Adyacentes.Agregar(mapaDict["Europa del Norte"]);
-
-            mapaDict["Europa Occidental"].Adyacentes.Agregar(mapaDict["Gran Bretaña"]);
-            mapaDict["Europa Occidental"].Adyacentes.Agregar(mapaDict["Europa del Sur"]);
-            mapaDict["Europa Occidental"].Adyacentes.Agregar(mapaDict["Europa del Norte"]);
-            mapaDict["Europa Occidental"].Adyacentes.Agregar(mapaDict["África del Norte"]);
-
-            mapaDict["Europa del Norte"].Adyacentes.Agregar(mapaDict["Gran Bretaña"]);
-            mapaDict["Europa del Norte"].Adyacentes.Agregar(mapaDict["Escandinavia"]);
-            mapaDict["Europa del Norte"].Adyacentes.Agregar(mapaDict["Europa Occidental"]);
-            mapaDict["Europa del Norte"].Adyacentes.Agregar(mapaDict["Europa del Sur"]);
-            mapaDict["Europa del Norte"].Adyacentes.Agregar(mapaDict["Ucrania"]);
-
-            mapaDict["Europa del Sur"].Adyacentes.Agregar(mapaDict["Europa Occidental"]);
-            mapaDict["Europa del Sur"].Adyacentes.Agregar(mapaDict["Europa del Norte"]);
-            mapaDict["Europa del Sur"].Adyacentes.Agregar(mapaDict["Ucrania"]);
-            mapaDict["Europa del Sur"].Adyacentes.Agregar(mapaDict["Medio Oriente"]);
-            mapaDict["Europa del Sur"].Adyacentes.Agregar(mapaDict["Egipto"]);
-            mapaDict["Europa del Sur"].Adyacentes.Agregar(mapaDict["África del Norte"]);
-
-            mapaDict["Ucrania"].Adyacentes.Agregar(mapaDict["Escandinavia"]);
-            mapaDict["Ucrania"].Adyacentes.Agregar(mapaDict["Europa del Norte"]);
-            mapaDict["Ucrania"].Adyacentes.Agregar(mapaDict["Europa del Sur"]);
-            mapaDict["Ucrania"].Adyacentes.Agregar(mapaDict["Afganistán"]);
-            mapaDict["Ucrania"].Adyacentes.Agregar(mapaDict["Ural"]);
-            mapaDict["Ucrania"].Adyacentes.Agregar(mapaDict["Medio Oriente"]);
-
-            // === África ===
-            mapaDict["África del Norte"].Adyacentes.Agregar(mapaDict["Brasil"]);
-            mapaDict["África del Norte"].Adyacentes.Agregar(mapaDict["Europa Occidental"]);
-            mapaDict["África del Norte"].Adyacentes.Agregar(mapaDict["Europa del Sur"]);
-            mapaDict["África del Norte"].Adyacentes.Agregar(mapaDict["Egipto"]);
-            mapaDict["África del Norte"].Adyacentes.Agregar(mapaDict["Congo"]);
-
-            mapaDict["Egipto"].Adyacentes.Agregar(mapaDict["África del Norte"]);
-            mapaDict["Egipto"].Adyacentes.Agregar(mapaDict["África Oriental"]);
-            mapaDict["Egipto"].Adyacentes.Agregar(mapaDict["Medio Oriente"]);
-            mapaDict["Egipto"].Adyacentes.Agregar(mapaDict["Europa del Sur"]);
-
-            mapaDict["Congo"].Adyacentes.Agregar(mapaDict["África del Norte"]);
-            mapaDict["Congo"].Adyacentes.Agregar(mapaDict["África Oriental"]);
-            mapaDict["Congo"].Adyacentes.Agregar(mapaDict["África del Sur"]);
-
-            mapaDict["África Oriental"].Adyacentes.Agregar(mapaDict["Egipto"]);
-            mapaDict["África Oriental"].Adyacentes.Agregar(mapaDict["Congo"]);
-            mapaDict["África Oriental"].Adyacentes.Agregar(mapaDict["África del Sur"]);
-            mapaDict["África Oriental"].Adyacentes.Agregar(mapaDict["Madagascar"]);
-            mapaDict["África Oriental"].Adyacentes.Agregar(mapaDict["Medio Oriente"]);
-
-            mapaDict["África del Sur"].Adyacentes.Agregar(mapaDict["Congo"]);
-            mapaDict["África del Sur"].Adyacentes.Agregar(mapaDict["África Oriental"]);
-            mapaDict["África del Sur"].Adyacentes.Agregar(mapaDict["Madagascar"]);
-
-            mapaDict["Madagascar"].Adyacentes.Agregar(mapaDict["África Oriental"]);
-            mapaDict["Madagascar"].Adyacentes.Agregar(mapaDict["África del Sur"]);
-
-            // === Asia ===
-            mapaDict["Ural"].Adyacentes.Agregar(mapaDict["Ucrania"]);
-            mapaDict["Ural"].Adyacentes.Agregar(mapaDict["Siberia"]);
-            mapaDict["Ural"].Adyacentes.Agregar(mapaDict["China"]);
-            mapaDict["Ural"].Adyacentes.Agregar(mapaDict["Afganistán"]);
-
-            mapaDict["Siberia"].Adyacentes.Agregar(mapaDict["Ural"]);
-            mapaDict["Siberia"].Adyacentes.Agregar(mapaDict["Yakutsk"]);
-            mapaDict["Siberia"].Adyacentes.Agregar(mapaDict["Irkutsk"]);
-            mapaDict["Siberia"].Adyacentes.Agregar(mapaDict["Mongolia"]);
-            mapaDict["Siberia"].Adyacentes.Agregar(mapaDict["China"]);
-
-            mapaDict["Yakutsk"].Adyacentes.Agregar(mapaDict["Siberia"]);
-            mapaDict["Yakutsk"].Adyacentes.Agregar(mapaDict["Irkutsk"]);
-            mapaDict["Yakutsk"].Adyacentes.Agregar(mapaDict["Kamchatka"]);
-
-            mapaDict["Kamchatka"].Adyacentes.Agregar(mapaDict["Yakutsk"]);
-            mapaDict["Kamchatka"].Adyacentes.Agregar(mapaDict["Irkutsk"]);
-            mapaDict["Kamchatka"].Adyacentes.Agregar(mapaDict["Mongolia"]);
-            mapaDict["Kamchatka"].Adyacentes.Agregar(mapaDict["Japón"]);
-            mapaDict["Kamchatka"].Adyacentes.Agregar(mapaDict["Alaska"]);
-
-            mapaDict["Irkutsk"].Adyacentes.Agregar(mapaDict["Siberia"]);
-            mapaDict["Irkutsk"].Adyacentes.Agregar(mapaDict["Yakutsk"]);
-            mapaDict["Irkutsk"].Adyacentes.Agregar(mapaDict["Kamchatka"]);
-            mapaDict["Irkutsk"].Adyacentes.Agregar(mapaDict["Mongolia"]);
-
-            mapaDict["Mongolia"].Adyacentes.Agregar(mapaDict["Siberia"]);
-            mapaDict["Mongolia"].Adyacentes.Agregar(mapaDict["Irkutsk"]);
-            mapaDict["Mongolia"].Adyacentes.Agregar(mapaDict["Kamchatka"]);
-            mapaDict["Mongolia"].Adyacentes.Agregar(mapaDict["Japón"]);
-            mapaDict["Mongolia"].Adyacentes.Agregar(mapaDict["China"]);
-
-            mapaDict["Japón"].Adyacentes.Agregar(mapaDict["Kamchatka"]);
-            mapaDict["Japón"].Adyacentes.Agregar(mapaDict["Mongolia"]);
-
-            mapaDict["China"].Adyacentes.Agregar(mapaDict["Ural"]);
-            mapaDict["China"].Adyacentes.Agregar(mapaDict["Siberia"]);
-            mapaDict["China"].Adyacentes.Agregar(mapaDict["Mongolia"]);
-            mapaDict["China"].Adyacentes.Agregar(mapaDict["Siam"]);
-            mapaDict["China"].Adyacentes.Agregar(mapaDict["India"]);
-            mapaDict["China"].Adyacentes.Agregar(mapaDict["Afganistán"]);
-
-            mapaDict["India"].Adyacentes.Agregar(mapaDict["China"]);
-            mapaDict["India"].Adyacentes.Agregar(mapaDict["Siam"]);
-            mapaDict["India"].Adyacentes.Agregar(mapaDict["Medio Oriente"]);
-            mapaDict["India"].Adyacentes.Agregar(mapaDict["Afganistán"]);
-
-            mapaDict["Afganistán"].Adyacentes.Agregar(mapaDict["Ucrania"]);
-            mapaDict["Afganistán"].Adyacentes.Agregar(mapaDict["Ural"]);
-            mapaDict["Afganistán"].Adyacentes.Agregar(mapaDict["China"]);
-            mapaDict["Afganistán"].Adyacentes.Agregar(mapaDict["India"]);
-            mapaDict["Afganistán"].Adyacentes.Agregar(mapaDict["Medio Oriente"]);
-
-            mapaDict["Medio Oriente"].Adyacentes.Agregar(mapaDict["Europa del Sur"]);
-            mapaDict["Medio Oriente"].Adyacentes.Agregar(mapaDict["Egipto"]);
-            mapaDict["Medio Oriente"].Adyacentes.Agregar(mapaDict["África Oriental"]);
-            mapaDict["Medio Oriente"].Adyacentes.Agregar(mapaDict["India"]);
-            mapaDict["Medio Oriente"].Adyacentes.Agregar(mapaDict["Afganistán"]);
-
-            mapaDict["Siam"].Adyacentes.Agregar(mapaDict["China"]);
-            mapaDict["Siam"].Adyacentes.Agregar(mapaDict["India"]);
-            mapaDict["Siam"].Adyacentes.Agregar(mapaDict["Indonesia"]);
-
-            // === Oceanía ===
-            mapaDict["Indonesia"].Adyacentes.Agregar(mapaDict["Siam"]);
-            mapaDict["Indonesia"].Adyacentes.Agregar(mapaDict["Nueva Guinea"]);
-            mapaDict["Indonesia"].Adyacentes.Agregar(mapaDict["Australia Occidental"]);
-
-            mapaDict["Nueva Guinea"].Adyacentes.Agregar(mapaDict["Indonesia"]);
-            mapaDict["Nueva Guinea"].Adyacentes.Agregar(mapaDict["Australia Occidental"]);
-            mapaDict["Nueva Guinea"].Adyacentes.Agregar(mapaDict["Australia Oriental"]);
-
-            mapaDict["Australia Occidental"].Adyacentes.Agregar(mapaDict["Indonesia"]);
-            mapaDict["Australia Occidental"].Adyacentes.Agregar(mapaDict["Nueva Guinea"]);
-            mapaDict["Australia Occidental"].Adyacentes.Agregar(mapaDict["Australia Oriental"]);
-
-            mapaDict["Australia Oriental"].Adyacentes.Agregar(mapaDict["Nueva Guinea"]);
-            mapaDict["Australia Oriental"].Adyacentes.Agregar(mapaDict["Australia Occidental"]);
+            // Especial
+            mapaDict["TEC"].Adyacentes.Agregar(mapaDict["Canada"]);
         }
 
         // Mazo global de donde se sacan las tarjetas.
