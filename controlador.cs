@@ -11,6 +11,7 @@ namespace CrazyRisk.ViewModels
         // Contador para seguir la secuencia de refuerzo: 1er intercambio = 2, 2do = 3, etc.
 
         public Jugador Neutro { get; private set; } //jugador neutro que hice para los territorios, atte dilan
+        public EtapaTurno EtapaActual { get; private set; } = EtapaTurno.Refuerzo;
         private int ContadorGlobalIntercambios = 1;
 
         public Jugador Actual { get; private set; } = null!;
@@ -475,6 +476,42 @@ namespace CrazyRisk.ViewModels
                 nodoTrio = nodoTrio.Siguiente;
             }
         }
+        // Colocación alternada de tropas iniciales por los jugadores
+        public void ColocarTropaInicialAlternada()
+        {
+            while (Jugador1.TropasDisponibles > 0 || Jugador2.TropasDisponibles > 0)
+            {
+                if (Jugador1.TropasDisponibles > 0)
+                {
+                    Territorio territorio = SeleccionarTerritorioAleatorio(Jugador1);
+                    territorio.Tropas++;
+                    Jugador1.TropasDisponibles--;
+                }
+
+                if (Jugador2.TropasDisponibles > 0)
+                {
+                    Territorio territorio = SeleccionarTerritorioAleatorio(Jugador2);
+                    territorio.Tropas++;
+                    Jugador2.TropasDisponibles--;
+                }
+            }
+        }
+
+        // Selecciona un territorio aleatorio del jugador
+        private Territorio SeleccionarTerritorioAleatorio(Jugador jugador)
+        {
+            var territorios = new List<Territorio>();
+            var nodo = Mapa.Territorios.ObtenerCabeza();
+            while (nodo != null)
+            {
+                if (nodo.Valor.Dueño == jugador)
+                    territorios.Add(nodo.Valor);
+                nodo = nodo.Siguiente;
+            }
+
+            var rand = new Random();
+            return territorios[rand.Next(territorios.Count)];
+        }
         public bool EsTrioValido(Lista<Tarjeta> trio)
         {
             if (trio.ObtenerTamaño() != 3)
@@ -782,7 +819,7 @@ namespace CrazyRisk.ViewModels
             }
         }
 
-// Activa tercer jugador como reemplazo del neutro
+        // Activa tercer jugador como reemplazo del neutro
         public void ActivarTercerJugador(string alias, string color)
         {
             Neutro = new Jugador(alias, color);
@@ -794,6 +831,59 @@ namespace CrazyRisk.ViewModels
                 nodo = nodo.Siguiente;
             }
         }
+
+        public void AvanzarEtapa()
+        {
+            if (EtapaActual == EtapaTurno.Refuerzo)
+                EtapaActual = EtapaTurno.Ataque;
+            else if (EtapaActual == EtapaTurno.Ataque)
+                EtapaActual = EtapaTurno.Movimiento;
+            else
+            {
+                EtapaActual = EtapaTurno.Refuerzo;
+                CambiarTurno();
+            }
+        }
+        public bool PuedeAtacar()
+        {
+            return EtapaActual == EtapaTurno.Ataque && !Actual.DebeIntercambiarTarjetas;
+        }
+
+        public bool PuedeMover()
+        {
+            return EtapaActual == EtapaTurno.Movimiento && !Actual.DebeIntercambiarTarjetas;
+        }
+
+        public bool PuedeColocarRefuerzo()
+        {
+            return EtapaActual == EtapaTurno.Refuerzo && !Actual.DebeIntercambiarTarjetas;
+        }
+        public bool VerificarFinDePartida()
+        {
+            if (HaGanado(Jugador1))
+            {
+                Console.WriteLine($"¡{Jugador1.Alias} ha ganado!");
+                return true;
+            }
+            else if (HaGanado(Jugador2))
+            {
+                Console.WriteLine($"¡{Jugador2.Alias} ha ganado!");
+                return true;
+            }
+            else if (HaGanado(Neutro))
+            {
+                Console.WriteLine($"¡{Neutro.Alias} ha ganado!");
+                return true;
+            }
+            return false;
+        }
+        public void PrepararRefuerzosInicialesTresJugadores()
+        {
+            int tropasIniciales = 35;
+            Jugador1.TropasDisponibles = tropasIniciales - ContarTerritorios(Jugador1);
+            Jugador2.TropasDisponibles = tropasIniciales - ContarTerritorios(Jugador2);
+            Neutro.TropasDisponibles = tropasIniciales - ContarTerritorios(Neutro);
+        }    
     }
     
 }
