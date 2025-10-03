@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
+using CrazyRisk.Comms;
 
 class Server
 {
@@ -129,21 +130,42 @@ class Server
     }
 
     // Lógica para manejar la comunicación del juego
-    private static void HandleGameClient(TcpClient client, string playerName)
+    private static async Task HandleGameClient(TcpClient client, string playerName)
     {
         NetworkStream stream = null;
         try
         {
             stream = client.GetStream();
-            byte[] buffer = new byte[256];
-            int bytesRead;
-
-            while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) != 0)
+            using (var reader = new System.IO.StreamReader(stream, Encoding.UTF8))
             {
-                string receivedData = Encoding.UTF8.GetString(buffer, 0, bytesRead);
-                Console.WriteLine($"{playerName} dice: {receivedData}");
-                byte[] responseData = Encoding.UTF8.GetBytes($"Servidor: Mensaje recibido de {playerName}.");
-                stream.Write(responseData, 0, responseData.Length);
+                string? receivedJson;
+                // Lee línea por línea, esperando un mensaje completo por línea
+                while ((receivedJson = await reader.ReadLineAsync()) != null)
+                {
+                    Console.WriteLine($"{playerName} dice (JSON): {receivedJson}");
+                    
+                    // 1. Deserializar el JSON recibido
+                    var comando = JsonHelper.DeserializarComando(receivedJson);
+
+                    if (comando != null)
+                    {
+                        // 2. Procesar el Comando (Esto es la parte clave)
+                        // Aquí llamarías a tu GameController para ejecutar la lógica:
+                        // GameController.ProcesarComando(comando);
+
+                        // --- EJEMPLO de RESPUESTA ---
+                        // El servidor genera una respuesta (Ej: Estado actualizado)
+                        var responseComando = new MensajeJuego("RESPUESTA", "SERVER");
+                        responseComando.Datos.Add("status", "OK");
+                        responseComando.Datos.Add("message", $"Comando {comando.TipoComando} recibido.");
+                        
+                        string responseJson = JsonHelper.SerializarComando(responseComando);
+                        
+                        // 3. Serializar y Enviar la Respuesta (con un delimitador \n)
+                        byte[] responseData = Encoding.UTF8.GetBytes(responseJson + "\n");
+                        await stream.WriteAsync(responseData, 0, responseData.Length);
+                    }
+                }
             }
         }
         catch (Exception e)

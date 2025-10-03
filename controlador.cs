@@ -1,5 +1,6 @@
 using CrazyRisk.Models;
 
+
 namespace CrazyRisk.ViewModels
 {
     public class GameController
