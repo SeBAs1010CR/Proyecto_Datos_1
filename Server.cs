@@ -13,6 +13,10 @@ class Server
     private const int mainPort = 1234;
     private const int player1Port = 1665;
     private const int player2Port = 1666;
+    private static GameController game = new GameController(); // Instancia ÚNICA del juego
+    // Diccionario para almacenar el StreamWriter de cada jugador por su alias.
+    // Esto permite enviar mensajes a ambos clientes.
+    private static readonly ConcurrentDictionary<string, StreamWriter> gameClients = new ConcurrentDictionary<string, StreamWriter>();
 
     public static async Task Main(string[] args)
     {
@@ -26,7 +30,7 @@ class Server
         // Espera a que todas las tareas se completen (lo que en este caso no ocurrirá)
         await Task.WhenAll(mainServerTask, player1ServerTask, player2ServerTask);
     }
-    
+
     // Servidor principal que asigna los puertos
     private static void StartMainServer()
     {
@@ -132,38 +136,85 @@ class Server
     // Lógica para manejar la comunicación del juego
     private static async Task HandleGameClient(TcpClient client, string playerName)
     {
-        NetworkStream stream = null;
+        NetworkStream stream = client.GetStream();
+        var reader = new StreamReader(stream, Encoding.UTF8);
+        // IMPORTANTE: Usar StreamWriter para WriteLineAsync, con AutoFlush.
+        var writer = new StreamWriter(stream, Encoding.UTF8) { AutoFlush = true }; 
+        
+        // 1. Almacenar el escritor para el Broadcast
+        // Usamos el playerName que se pasó desde StartGameServer
+        gameClients.TryAdd(playerName, writer); 
+        
+        // **ESTABLECER EL JUGADOR INICIAL DE LA INSTANCIA DE JUEGO**
+        if (game.Actual == null)
+        {
+            // Asumiendo que Jugador1 se inicializa en el constructor de GameController
+            game.Actual = game.Jugador1; 
+            Console.WriteLine($"Turno inicial asignado a: {game.Actual.Alias}");
+            
+            // NOTA: Si necesitas preparar refuerzos, hazlo aquí o al inicio de GameController.
+            // game.PrepararRefuerzosIniciales(); 
+        }
+
         try
         {
-            stream = client.GetStream();
-            using (var reader = new System.IO.StreamReader(stream, Encoding.UTF8))
+            string? receivedJson;
+            while ((receivedJson = await reader.ReadLineAsync()) != null)
             {
-                string? receivedJson;
-                // Lee línea por línea, esperando un mensaje completo por línea
-                while ((receivedJson = await reader.ReadLineAsync()) != null)
+                var comando = JsonHelper.DeserializarComando(receivedJson);
+
+                if (comando != null)
                 {
-                    Console.WriteLine($"{playerName} dice (JSON): {receivedJson}");
+                    Console.WriteLine($"Comando recibido de {comando.JugadorAlias}: {comando.TipoComando}");
                     
-                    // 1. Deserializar el JSON recibido
-                    var comando = JsonHelper.DeserializarComando(receivedJson);
-
-                    if (comando != null)
+                    // 2. VALIDACIÓN BÁSICA: ¿Es su turno?
+                    if (comando.JugadorAlias != game.Actual.Alias)
                     {
-                        // 2. Procesar el Comando (Esto es la parte clave)
-                        // Aquí llamarías a tu GameController para ejecutar la lógica:
-                        // GameController.ProcesarComando(comando);
+                        // Opcional: Enviar mensaje de error solo a este cliente.
+                        continue; 
+                    }
 
-                        // --- EJEMPLO de RESPUESTA ---
-                        // El servidor genera una respuesta (Ej: Estado actualizado)
-                        var responseComando = new MensajeJuego("RESPUESTA", "SERVER");
-                        responseComando.Datos.Add("status", "OK");
-                        responseComando.Datos.Add("message", $"Comando {comando.TipoComando} recibido.");
+                    bool stateChanged = false;
+
+                    // 3. LÓGICA CENTRAL DE JUEGO (Switch Case)
+                    switch (comando.TipoComando)
+                    {
+                        case "COLOCAR_TROPA":
+                            // *TODO: Implementa el método ColocarRefuerzo en GameController.*
+                            // if (game.PuedeColocarRefuerzo() && game.ColocarRefuerzo(comando.Datos, comando.JugadorAlias))
+                            // {
+                            //     stateChanged = true;
+                            // }
+                            stateChanged = true; // Asumimos éxito por ahora
+                            break;
+
+                        case "FIN_FASE": // El cliente envía esto al terminar una fase (Refuerzo, Ataque, Movimiento)
+                            game.AvanzarFase(); // *TODO: Implementa AvanzarFase en GameController.*
+                            stateChanged = true;
+                            break;
+                            
+                        case "FIN_TURNO":
+                            game.CambiarTurno();
+                            game.EtapaActual = EtapaTurno.Refuerzo; // Reiniciar fase
+                            stateChanged = true;
+                            break;
+                            
+                        // Añadir más casos (ATAQUE, MOVER, INTERCAMBIAR_TARJETAS...)
+                    }
+
+                    // 4. BROADCAST: Enviar nuevo estado a todos
+                    if (stateChanged)
+                    {
+                        // Crea un estado simplificado del mapa (Dueño y Tropas de cada Territorio)
+                        // para enviarlo por la red (ver nota en sección C).
+                        var mapState = game.GetSimplifiedMapState(); // *TODO: Implementa este método*
                         
-                        string responseJson = JsonHelper.SerializarComando(responseComando);
+                        var update = new MensajeJuego("ACTUALIZAR_ESTADO", "SERVER");
+                        update.Datos.Add("JugadorActual", game.Actual.Alias);
+                        update.Datos.Add("EtapaActual", game.EtapaActual.ToString());
+                        update.Datos.Add("Mapa", mapState); 
                         
-                        // 3. Serializar y Enviar la Respuesta (con un delimitador \n)
-                        byte[] responseData = Encoding.UTF8.GetBytes(responseJson + "\n");
-                        await stream.WriteAsync(responseData, 0, responseData.Length);
+                        await BroadcastUpdate(update);
                     }
                 }
             }
@@ -176,6 +227,49 @@ class Server
         {
             stream?.Close();
             client.Close();
+        }
+    }
+    // Envía la actualización de estado a AMBOS clientes (1665 y 1666).
+    private static async Task BroadcastUpdate(MensajeJuego update)
+    {
+        string json = JsonHelper.SerializarComando(update);
+        Console.WriteLine($"[SERVER BROADCAST] {update.TipoComando}");
+        
+        // Envía el mensaje a todos los jugadores conectados.
+        foreach (var writer in gameClients.Values)
+        {
+            await writer.WriteLineAsync(json);
+            await writer.FlushAsync();
+        }
+    }
+
+    // Servidor de juego que maneja la comunicación de un jugador
+    private static async Task StartGameServer(int port, string playerName) // Convertido a async
+    {
+        TcpListener server = null;
+        try
+        {
+            server = new TcpListener(IPAddress.Any, port);
+            server.Start();
+            Console.WriteLine($"Servidor de juego para {playerName} escuchando en puerto {port}...");
+
+            while (true)
+            {
+                // Solo un cliente por este puerto
+                TcpClient client = await server.AcceptTcpClientAsync(); // Usar Async
+                Console.WriteLine($"{playerName} conectado al puerto {port}.");
+                
+                // Procesar la comunicación de este cliente en una tarea separada
+                _ = Task.Run(() => HandleGameClient(client, playerName)); 
+            }
+        }
+        catch (SocketException e)
+        {
+            Console.WriteLine($"Error del servidor {playerName}: {e.Message}");
+        }
+        finally
+        {
+            server?.Stop();
         }
     }
 }
