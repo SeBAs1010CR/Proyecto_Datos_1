@@ -202,12 +202,12 @@ namespace CrazyRisk.ViewModels
                 new Territorio("India", "Asia"),
                 new Territorio("Australia", "Oceania"),
                 new Territorio("Arabia_Saudita", "Asia"),
-                new Territorio("Europa_1", "Europa"),
-                new Territorio("Europa_2", "Europa"),
+                new Territorio("Italia", "Europa"),
+                new Territorio("Alemania", "Europa"),
                 new Territorio("Turquia", "Europa"),
-                new Territorio("Asia_1", "Asia"),
-                new Territorio("Africa_1", "Africa"),
-                new Territorio("Africa_2", "Africa"),
+                new Territorio("Nepal", "Asia"),
+                new Territorio("Nigeria", "Africa"),
+                new Territorio("Sudafrica", "Africa"),
                 new Territorio("TEC", "Especial")
             };
             // 2. Mezclar aleatoriamente
@@ -225,6 +225,7 @@ namespace CrazyRisk.ViewModels
                 else
                     territorio.Dueño = Neutro;
 
+                mapaDict["Guatemala"].Adyacentes.Agregar(mapaDict["Belice"]);
                 territorio.Tropas = 1; // Tropas iniciales
                 Mapa.AgregarTerritorio(territorio);
                 index++;
@@ -232,18 +233,23 @@ namespace CrazyRisk.ViewModels
             // Crew dicionario para acceder rapido, atte, dilan
             var mapaDict = territorios.ToDictionary(t => t.Nombre);
 
-            
+
 
             // América Central
             mapaDict["Mexico"].Adyacentes.Agregar(mapaDict["Estados_Unidos"]);
             mapaDict["Mexico"].Adyacentes.Agregar(mapaDict["Guatemala"]);
-            mapaDict["Guatemala"].Adyacentes.Agregar(mapaDict["Belice"]);
             mapaDict["Guatemala"].Adyacentes.Agregar(mapaDict["El_Salvador"]);
             mapaDict["El_Salvador"].Adyacentes.Agregar(mapaDict["Honduras"]);
             mapaDict["Honduras"].Adyacentes.Agregar(mapaDict["Nicaragua"]);
             mapaDict["Nicaragua"].Adyacentes.Agregar(mapaDict["Costa_Rica"]);
             mapaDict["Costa_Rica"].Adyacentes.Agregar(mapaDict["Panama"]);
             mapaDict["Panama"].Adyacentes.Agregar(mapaDict["Colombia"]);
+            mapaDict["Cuba"].Adyacentes.Agregar(mapaDict["Jamaica"]);
+            mapaDict["Cuba"].Adyacentes.Agregar(mapaDict["Republica_Dominicana"]);
+            mapaDict["Jamaica"].Adyacentes.Agregar(mapaDict["Cuba"]);
+            mapaDict["Republica_Dominicana"].Adyacentes.Agregar(mapaDict["Cuba"]);
+            mapaDict["Republica_Dominicana"].Adyacentes.Agregar(mapaDict["Puerto_Rico"]);
+            mapaDict["Puerto_Rico"].Adyacentes.Agregar(mapaDict["Republica_Dominicana"]);
 
             // América del Sur
             mapaDict["Colombia"].Adyacentes.Agregar(mapaDict["Venezuela"]);
@@ -255,9 +261,70 @@ namespace CrazyRisk.ViewModels
             mapaDict["Paraguay"].Adyacentes.Agregar(mapaDict["Argentina"]);
             mapaDict["Argentina"].Adyacentes.Agregar(mapaDict["Chile"]);
             mapaDict["Argentina"].Adyacentes.Agregar(mapaDict["Uruguay"]);
+            mapaDict["Venezuela"].Adyacentes.Agregar(mapaDict["Guyana"]);
+            mapaDict["Guyana"].Adyacentes.Agregar(mapaDict["Venezuela"]);
+            mapaDict["Guyana"].Adyacentes.Agregar(mapaDict["Guyana_Francesa"]);
+            mapaDict["Guyana"].Adyacentes.Agregar(mapaDict["Suriname"]);
 
-            // Especial
-            mapaDict["TEC"].Adyacentes.Agregar(mapaDict["Canada"]);
+            mapaDict["Guyana_Francesa"].Adyacentes.Agregar(mapaDict["Guyana"]);
+            mapaDict["Guyana_Francesa"].Adyacentes.Agregar(mapaDict["Suriname"]);
+
+            mapaDict["Suriname"].Adyacentes.Agregar(mapaDict["Guyana"]);
+            mapaDict["Suriname"].Adyacentes.Agregar(mapaDict["Guyana_Francesa"]);
+            mapaDict["Suriname"].Adyacentes.Agregar(mapaDict["Brasil"]);
+
+            // norte
+            mapaDict["Rusia"].Adyacentes.Agregar(mapaDict["Alemania"]);
+            mapaDict["Rusia"].Adyacentes.Agregar(mapaDict["Nepal"]);
+            mapaDict["Rusia"].Adyacentes.Agregar(mapaDict["Mongolia"]);
+            mapaDict["Rusia"].Adyacentes.Agregar(mapaDict["China"]);
+            mapaDict["Rusia"].Adyacentes.Agregar(mapaDict["TEC"]);
+
+            mapaDict["TEC"].Adyacentes.Agregar(mapaDict["Rusia"]);
+            mapaDict["TEC"].Adyacentes.Agregar(mapaDict["Islandia"]);
+
+            mapaDict["Dinamarca"].Adyacentes.Agregar(mapaDict["Canada"]);
+            mapaDict["Dinamarca"].Adyacentes.Agregar(mapaDict["Islandia"]);
+
+            mapaDict["Islandia"].Adyacentes.Agregar(mapaDict["TEC"]);
+            mapaDict["Islandia"].Adyacentes.Agregar(mapaDict["Italia"]);
+            //europa
+            mapaDict["Italia"].Adyacentes.Agregar(mapaDict["Alemania"]);
+            mapaDict["Italia"].Adyacentes.Agregar(mapaDict["Islandia"]);
+
+            mapaDict["Alemania"].Adyacentes.Agregar(mapaDict["Italia"]);
+            mapaDict["Alemania"].Adyacentes.Agregar(mapaDict["Rusia"]);
+            mapaDict["Alemania"].Adyacentes.Agregar(mapaDict["Turquia"]);
+
+            mapaDict["Turquia"].Adyacentes.Agregar(mapaDict["Alemania"]);
+            mapaDict["Turquia"].Adyacentes.Agregar(mapaDict["Rusia"]);
+            mapaDict["Turquia"].Adyacentes.Agregar(mapaDict["Arabia_Saudita"]);
+
+            //africa
+            mapaDict["Nigeria"].Adyacentes.Agregar(mapaDict["Italia"]);
+            mapaDict["Nigeria"].Adyacentes.Agregar(mapaDict["Sudafrica"]);
+
+            mapaDict["Sudafrica"].Adyacentes.Agregar(mapaDict["Nigeria"]);
+            mapaDict["Sudafrica"].Adyacentes.Agregar(mapaDict["Arabia_Saudita"]);
+            //asia
+            mapaDict["Arabia_Saudita"].Adyacentes.Agregar(mapaDict["Nepal"]);
+
+            mapaDict["Nepal"].Adyacentes.Agregar(mapaDict["Rusia"]);
+            mapaDict["Nepal"].Adyacentes.Agregar(mapaDict["China"]);
+            mapaDict["Nepal"].Adyacentes.Agregar(mapaDict["Mongolia"]);
+            mapaDict["Nepal"].Adyacentes.Agregar(mapaDict["India"]);
+
+            mapaDict["India"].Adyacentes.Agregar(mapaDict["China"]);
+            mapaDict["India"].Adyacentes.Agregar(mapaDict["Nepal"]);
+
+            mapaDict["China"].Adyacentes.Agregar(mapaDict["Nepal"]);
+            mapaDict["China"].Adyacentes.Agregar(mapaDict["Mongolia"]);
+            mapaDict["China"].Adyacentes.Agregar(mapaDict["Indonesia"]);
+
+            mapaDict["Indonesia"].Adyacentes.Agregar(mapaDict["China"]);
+            mapaDict["Indonesia"].Adyacentes.Agregar(mapaDict["Australia"]);
+
+            mapaDict["Australia"].Adyacentes.Agregar(mapaDict["Indonesia"]);
         }
 
         // Mazo global de donde se sacan las tarjetas.
