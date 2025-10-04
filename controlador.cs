@@ -155,6 +155,11 @@ namespace CrazyRisk.ViewModels
                 actual = actual.Siguiente;
             }
             return true;
+            //en caso de cambiar condicion de gane a tomar un continente
+            //private bool HaGanado(Jugador j)
+            //{
+            //return ControlaContinente(j, "Asia"); // Nueva condición
+            //}       
         }
 
         public void PrepararRefuerzosIniciales()
