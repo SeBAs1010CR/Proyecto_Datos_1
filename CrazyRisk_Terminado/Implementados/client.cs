@@ -21,7 +21,7 @@ namespace CrazyRisk.Comms
         public GameClient(string ip, string alias)
         {
             // Si no se especifica una IP, usar localhost
-            serverIp = string.IsNullOrWhiteSpace(ip) ? "127.0.0.1" : ip;
+            serverIp = string.IsNullOrWhiteSpace(ip) ? "192.168.0.235" : ip;
             PlayerAlias = alias;
         }
 

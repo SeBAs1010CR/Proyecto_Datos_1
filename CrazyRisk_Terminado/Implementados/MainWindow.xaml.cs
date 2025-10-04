@@ -16,6 +16,8 @@ namespace CrazyRisk
             InitializeComponent();
             // Navegación inicial al MainMenu (agregada automáticamente para resolver duplicado)
             MainFrame.Navigate(new Pages.MainMenu(MainFrame));
+            // Arranca el servidor en background (solo una vez)
+            Server.EnsureMainServerStarted();
 
             // El controlador de juego puede inicializarse aquí o inyectarse desde fuera.
             // game = new GameController();
