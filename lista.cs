@@ -1,3 +1,8 @@
+
+
+using CrazyRisk.Models;
+using System;
+#nullable enable
 public class Nodo<T>
 {
     public T Valor { get; set; }
