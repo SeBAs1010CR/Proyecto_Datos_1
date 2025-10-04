@@ -236,7 +236,7 @@ namespace CrazyRisk.ViewModels
                 else
                     territorio.Dueño = Neutro;
 
-                mapaDict["Guatemala"].Adyacentes.Agregar(mapaDict["Belice"]);
+                
                 territorio.Tropas = 1; // Tropas iniciales
                 Mapa.AgregarTerritorio(territorio);
                 index++;
@@ -256,7 +256,8 @@ namespace CrazyRisk.ViewModels
 
             mapaDict["Mexico"].Adyacentes.Agregar(mapaDict["Guatemala"]);
             mapaDict["Guatemala"].Adyacentes.Agregar(mapaDict["Mexico"]);
-
+            mapaDict["Guatemala"].Adyacentes.Agregar(mapaDict["Belice"]);
+            mapaDict["Belice"].Adyacentes.Agregar(mapaDict["Guatemala"]);
             mapaDict["Guatemala"].Adyacentes.Agregar(mapaDict["El_Salvador"]);
             mapaDict["El_Salvador"].Adyacentes.Agregar(mapaDict["Guatemala"]);
 
