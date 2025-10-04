@@ -28,7 +28,7 @@ public class Lista<T>
         }
     }
 
-    
+
     //Sebas
     public T SacarDelFrente()
     {
@@ -126,7 +126,62 @@ public class Lista<T>
     public bool EstaVacia() => cabeza == null;
 
     public Nodo<T>? ObtenerCabeza() => cabeza;
+    
+    
+// ✅ Nuevo: Convertir a arreglo
+    public T[] ConvertirAArray()
+    {
+        int tamaño = ObtenerTamaño();
+        T[] elementos = new T[tamaño];
+        Nodo<T>? actual = cabeza;
+        for (int i = 0; i < tamaño; i++)
+        {
+            elementos[i] = actual!.Valor;
+            actual = actual.Siguiente;
+        }
+        return elementos;
+    }
+
+    // ✅ Nuevo: Seleccionar elemento aleatorio
+    public T SeleccionarAleatorio()
+    {
+        if (EstaVacia())
+            throw new InvalidOperationException("La lista está vacía.");
+
+        int tamaño = ObtenerTamaño();
+        Random random = new Random();
+        int indice = random.Next(0, tamaño);
+
+        Nodo<T>? actual = cabeza;
+        for (int i = 0; i < indice; i++)
+            actual = actual!.Siguiente;
+
+        return actual!.Valor;
+    }
+
+    // ✅ Nuevo: Barajar lista (ya tienes Aleatorio, lo dejamos igual)
+    public void Aleatorio()
+    {
+        if (cabeza == null || cabeza.Siguiente == null)
+            return;
+
+        T[] elementos = ConvertirAArray();
+
+        Random random = new Random();
+        for (int i = elementos.Length - 1; i > 0; i--)
+        {
+            int j = random.Next(0, i + 1);
+            T temp = elementos[i];
+            elementos[i] = elementos[j];
+            elementos[j] = temp;
+        }
+
+        cabeza = null;
+        foreach (var e in elementos)
+            Agregar(e);
+    }
 }
+
 
 
 
