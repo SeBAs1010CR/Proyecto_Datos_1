@@ -1,3 +1,4 @@
+
 using CrazyRisk.Models;
 
 
@@ -787,6 +788,58 @@ namespace CrazyRisk.ViewModels
                 EtapaActual = EtapaTurno.Refuerzo;
                 CambiarTurno();
             }
+
+        }
+        // Wrapper para compatibilidad con Server.cs
+        public void AvanzarFase()
+        {
+            AvanzarEtapa();
+        }
+
+        // Colocar refuerzo simple: coloca una tropa en el territorio indicado por nombre
+        // Devuelve true si la colocación tuvo éxito.
+        public bool ColocarRefuerzo(string nombreTerritorio)
+        {
+            var territorio = GetTerritorio(nombreTerritorio);
+            if (territorio == null) return false;
+            if (Actual == null) return false;
+            if (Actual.TropasDisponibles <= 0) return false;
+
+            territorio.Tropas += 1;
+            Actual.TropasDisponibles -= 1;
+            return true;
+        }
+
+        // Devuelve un estado simplificado del mapa para enviar por la red.
+        // Estructura: Dictionary<string, object> con claves: "Territorios" -> List<Dictionary<string, object>>
+        public Dictionary<string, object> GetSimplifiedMapState()
+        {
+            var mapList = new Lista<Dictionary<string, object>>();
+            var nodo = Mapa.Territorios.ObtenerCabeza();
+            while (nodo != null)
+            {
+                var t = nodo.Valor;
+                var territorioData = new Dictionary<string, object>
+                {
+                    { "Nombre", t.Nombre },
+                    { "Dueno", t.Dueño?.Alias ?? "N/A" },
+                    { "Tropas", t.Tropas }
+                };
+                mapList.Agregar(territorioData);
+                nodo = nodo.Siguiente;
+            }
+
+            var result = new Dictionary<string, object>();
+            result["Territorios"] = mapList; // Ahora es tu Lista<T>
+            result["JugadorActual"] = Actual?.Alias ?? "";
+            result["EtapaActual"] = EtapaActual.ToString();
+            return result;
+        }
+            var result = new Dictionary<string, object>();
+            result["Territorios"] = mapList;
+            result["JugadorActual"] = Actual?.Alias ?? "";
+            result["EtapaActual"] = EtapaActual.ToString();
+            return result;
         }
         public bool PuedeAtacar()
         {
