@@ -695,29 +695,30 @@ namespace CrazyRisk.ViewModels
         }
         //Dilan
         // Verifica si hay ruta entre dos territorios del mismo jugador
-        private bool ExisteRutaEntre(Territorio origen, Territorio destino, Jugador jugador)
+    private bool ExisteRutaEntre(Territorio origen, Territorio destino, Jugador jugador)
+    {
+        var visitados = new Lista<Territorio>();
+        var cola = new Cola<Territorio>();
+        cola.Encolar(origen);
+
+        while (!cola.EstaVacia())
         {
-            var visitados = new HashSet<Territorio>();
-            var cola = new Queue<Territorio>();
-            cola.Enqueue(origen);
+            var actual = cola.Desencolar();
+            if (actual == destino) return true;
 
-            while (cola.Count > 0)
+            visitados.Agregar(actual);
+
+            var nodo = actual.Adyacentes.ObtenerCabeza();
+            while (nodo != null)
             {
-                var actual = cola.Dequeue();
-                if (actual == destino) return true;
-                visitados.Add(actual);
-
-                var nodo = actual.Adyacentes.ObtenerCabeza();
-                while (nodo != null)
-                {
-                    var vecino = nodo.Valor;
-                    if (vecino.Dueño == jugador && !visitados.Contains(vecino))
-                        cola.Enqueue(vecino);
-                    nodo = nodo.Siguiente;
-                }
+                var vecino = nodo.Valor;
+                if (vecino.Dueño == jugador && !visitados.Contiene(vecino))
+                    cola.Encolar(vecino);
+                nodo = nodo.Siguiente;
             }
-            return false;
         }
+        return false;
+    }
 
         // Coloca tropas restantes del jugador neutro aleatoriamente
         public void DistribuirTropasNeutro()
