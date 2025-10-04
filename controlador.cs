@@ -8,11 +8,11 @@ namespace CrazyRisk.ViewModels
         public Mapa Mapa { get; private set; }
         public Jugador Jugador1 { get; private set; }
         public Jugador Jugador2 { get; private set; }
-        // Contador para seguir la secuencia de refuerzo: 1er intercambio = 2, 2do = 3, etc.
-
+        
         public Jugador Neutro { get; private set; } //jugador neutro que hice para los territorios, atte dilan
         public EtapaTurno EtapaActual { get; private set; } = EtapaTurno.Refuerzo;
         private int ContadorGlobalIntercambios = 1;
+        // Contador para seguir la secuencia de refuerzo: 1er intercambio = 2, 2do = 3, etc.
 
         public Jugador Actual { get; private set; } = null!;
 
@@ -84,12 +84,24 @@ namespace CrazyRisk.ViewModels
             // - Un arreglo con los nombres de los territorios que lo componen
             var continentes = new Dictionary<string, (int bonus, string[] territorios)>
             {
-                { "América del Norte", (5, new[] { "Alaska", "Territorio del Noroeste", "Groenlandia", "Alberta", "Ontario", "Quebec", "Oeste de EE.UU.", "Este de EE.UU.", "México" }) },
-                { "América del Sur", (2, new[] { "Venezuela", "Perú", "Brasil", "Argentina" }) },
-                { "Europa", (5, new[] { "Islandia", "Escandinavia", "Gran Bretaña", "Europa Occidental", "Europa del Sur", "Europa del Norte", "Ucrania" }) },
-                { "África", (3, new[] { "África del Norte", "Egipto", "Congo", "África Oriental", "África del Sur", "Madagascar" }) },
-                { "Asia", (7, new[] { "Ural", "Siberia", "Yakutsk", "Kamchatka", "Irkutsk", "Mongolia", "Japón", "China", "India", "Afganistán", "Medio Oriente", "Siam" }) },
-                { "Oceanía", (2, new[] { "Indonesia", "Nueva Guinea", "Australia Occidental", "Australia Oriental" }) }
+                { "América", (5, new[] {
+                    "Estados_Unidos", "Canada", "Alaska", "Mexico", "Guatemala", "Belice", "El_Salvador", "Honduras",
+                    "Nicaragua", "Costa_Rica", "Panama", "Colombia", "Venezuela", "Ecuador", "Peru", "Brasil",
+                    "Guyana_Francesa", "Guyana", "Suriname", "Bolivia", "Paraguay", "Chile", "Argentina", "Uruguay",
+                    "Cuba", "Jamaica", "Haiti", "Republica_Dominicana", "Puerto_Rico"
+                }) },
+                { "Europa", (8, new[] {
+                    "Dinamarca", "Islandia", "Italia", "Alemania", "Turquia"
+                }) },
+                { "Asia", (7, new[] {
+                    "Rusia", "China", "Indonesia", "Mongolia", "India", "Arabia_Saudita", "Nepal"
+                }) },
+                { "Oceanía", (2, new[] {
+                    "Australia"
+                }) },
+                { "África", (3, new[] {
+                    "Nigeria", "Sudafrica"
+                }) }
             };
 
             int bonus = 0; // Acumulador para el total de tropas extra
@@ -120,7 +132,7 @@ namespace CrazyRisk.ViewModels
         }
 
 
-
+        //funcion que verifica si es adyacente
         public bool EsAdyacente(Territorio a, Territorio b)
         {
             var actual = a.Adyacentes.ObtenerCabeza();
@@ -143,6 +155,11 @@ namespace CrazyRisk.ViewModels
                 actual = actual.Siguiente;
             }
             return true;
+            //en caso de cambiar condicion de gane a tomar un continente
+            //private bool HaGanado(Jugador j)
+            //{
+            //return ControlaContinente(j, "Asia"); // Nueva condición
+            //}       
         }
 
         public void PrepararRefuerzosIniciales()
@@ -162,7 +179,7 @@ namespace CrazyRisk.ViewModels
         //DILAN
         {
             //  lista de 42 territorios con sus continentes
-            var territorios = new List<Territorio>
+            var territorios = new Lista<Territorio>
             {
                 new Territorio("Estados_Unidos", "America"),
                 new Territorio("Canada", "America"),
@@ -211,8 +228,7 @@ namespace CrazyRisk.ViewModels
                 new Territorio("TEC", "Especial")
             };
             // 2. Mezclar aleatoriamente
-            var random = new Random();
-            territorios = territorios.OrderBy(t => random.Next()).ToList();
+            territorios.Aleatorio();
 
             // 3. Repartir entre Jugador1, Jugador2 y Neutro
             int index = 0;
@@ -225,7 +241,7 @@ namespace CrazyRisk.ViewModels
                 else
                     territorio.Dueño = Neutro;
 
-                mapaDict["Guatemala"].Adyacentes.Agregar(mapaDict["Belice"]);
+                
                 territorio.Tropas = 1; // Tropas iniciales
                 Mapa.AgregarTerritorio(territorio);
                 index++;
@@ -245,7 +261,8 @@ namespace CrazyRisk.ViewModels
 
             mapaDict["Mexico"].Adyacentes.Agregar(mapaDict["Guatemala"]);
             mapaDict["Guatemala"].Adyacentes.Agregar(mapaDict["Mexico"]);
-
+            mapaDict["Guatemala"].Adyacentes.Agregar(mapaDict["Belice"]);
+            mapaDict["Belice"].Adyacentes.Agregar(mapaDict["Guatemala"]);
             mapaDict["Guatemala"].Adyacentes.Agregar(mapaDict["El_Salvador"]);
             mapaDict["El_Salvador"].Adyacentes.Agregar(mapaDict["Guatemala"]);
 
@@ -442,17 +459,15 @@ namespace CrazyRisk.ViewModels
         // Selecciona un territorio aleatorio del jugador
         private Territorio SeleccionarTerritorioAleatorio(Jugador jugador)
         {
-            var territorios = new List<Territorio>();
+            var territorios = new Lista<Territorio>();
             var nodo = Mapa.Territorios.ObtenerCabeza();
             while (nodo != null)
             {
                 if (nodo.Valor.Dueño == jugador)
-                    territorios.Add(nodo.Valor);
+                    territorios.Agregar(nodo.Valor);
                 nodo = nodo.Siguiente;
             }
-
-            var rand = new Random();
-            return territorios[rand.Next(territorios.Count)];
+            return territorios.SeleccionarAleatorio();
         }
         public bool EsTrioValido(Lista<Tarjeta> trio)
         {
@@ -685,69 +700,56 @@ namespace CrazyRisk.ViewModels
         }
         //Dilan
         // Verifica si hay ruta entre dos territorios del mismo jugador
-        private bool ExisteRutaEntre(Territorio origen, Territorio destino, Jugador jugador)
+    private bool ExisteRutaEntre(Territorio origen, Territorio destino, Jugador jugador)
+    {
+        var visitados = new Lista<Territorio>();
+        var cola = new Cola<Territorio>();
+        cola.Encolar(origen);
+
+        while (!cola.EstaVacia())
         {
-            var visitados = new HashSet<Territorio>();
-            var cola = new Queue<Territorio>();
-            cola.Enqueue(origen);
+            var actual = cola.Desencolar();
+            if (actual == destino) return true;
 
-            while (cola.Count > 0)
+            visitados.Agregar(actual);
+
+            var nodo = actual.Adyacentes.ObtenerCabeza();
+            while (nodo != null)
             {
-                var actual = cola.Dequeue();
-                if (actual == destino) return true;
-                visitados.Add(actual);
-
-                var nodo = actual.Adyacentes.ObtenerCabeza();
-                while (nodo != null)
-                {
-                    var vecino = nodo.Valor;
-                    if (vecino.Dueño == jugador && !visitados.Contains(vecino))
-                        cola.Enqueue(vecino);
-                    nodo = nodo.Siguiente;
-                }
+                var vecino = nodo.Valor;
+                if (vecino.Dueño == jugador && !visitados.Contiene(vecino))
+                    cola.Encolar(vecino);
+                nodo = nodo.Siguiente;
             }
-            return false;
         }
+        return false;
+    }
 
         // Coloca tropas restantes del jugador neutro aleatoriamente
         public void DistribuirTropasNeutro()
         {
             int restantes = 40 - ContarTerritorios(Neutro);
-            var territoriosNeutros = new List<Territorio>();
+            var territoriosNeutros = new Lista<Territorio>();
+
             var nodo = Mapa.Territorios.ObtenerCabeza();
             while (nodo != null)
             {
                 if (nodo.Valor.Dueño == Neutro)
-                    territoriosNeutros.Add(nodo.Valor);
+                    territoriosNeutros.Agregar(nodo.Valor);
                 nodo = nodo.Siguiente;
             }
 
-            var rand = new Random();
             while (restantes > 0)
             {
-                var territorio = territoriosNeutros[rand.Next(territoriosNeutros.Count)];
+                var territorio = territoriosNeutros.SeleccionarAleatorio(); // Usa tu método nuevo
                 territorio.Tropas++;
                 restantes--;
             }
         }
-
         // Baraja el mazo de tarjetas manualmente
         public void BarajarMazo()
         {
-            var tarjetas = new List<Tarjeta>();
-            var nodo = MazoDeTarjetas.ObtenerCabeza();
-            while (nodo != null)
-            {
-                tarjetas.Add(nodo.Valor);
-                nodo = nodo.Siguiente;
-            }
-
-            var rand = new Random();
-            tarjetas = tarjetas.OrderBy(t => rand.Next()).ToList();
-
-            MazoDeTarjetas = new Lista<Tarjeta>();
-            foreach (var tarjeta in tarjetas)
-                MazoDeTarjetas.Agregar(tarjeta);
+            MazoDeTarjetas.Aleatorio();
         }
 
         // Asigna tarjeta con nombre del territorio (opcional)
