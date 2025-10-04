@@ -4,8 +4,8 @@ using System.Windows;
 using System.Windows.Controls;
 using CrazyRisk.Models;
 using CrazyRisk.Comms;
-using CrazyRisk.Pages; // para navegar a otras Pages (MapPage, SetupPage)
-using CrazyRisk.ViewModels; // si necesitas acceso a Server (según estructura actual)
+using CrazyRisk.Pages;
+using CrazyRisk.ViewModels;
 
 namespace CrazyRisk.Pages
 {
@@ -27,34 +27,19 @@ namespace CrazyRisk.Pages
             ip = ipServidor;
             tropas = tropasIniciales;
 
-            // Mostrar jugador actual en la lista
+            // Mostrar jugador actual
             lstJugadores.Items.Add($"{alias} (Tropas: {tropas})");
 
             if (esServidor)
                 btnIniciar.Visibility = Visibility.Visible;
 
-            // --- Iniciar Servidor si este jugador lo creó ---
-            if (esServidor)
-            {
-                _ = Task.Run(async () =>
-                {
-                    try
-                    {
-                        Console.WriteLine("[UI] Iniciando servidor local...");
-                        await Server.Main(new string[] { });
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"[UI] Error iniciando servidor local: {ex.Message}");
-                    }
-                });
-            }
+            // --- NO volver a iniciar el servidor ---
+            // El servidor ya fue iniciado en SetupPage (Server.EnsureMainServerStarted())
 
             // --- Conectar como cliente ---
             gameClient = new GameClient(ip, alias);
             gameClient.UpdateReceived += (update) =>
             {
-                // Aquí podrías actualizar lista o mostrar eventos
                 Console.WriteLine($"[CLIENT-EVENT] Update recibido: {update.TipoComando}");
             };
 
@@ -62,11 +47,19 @@ namespace CrazyRisk.Pages
             {
                 try
                 {
+                    Console.WriteLine($"[CLIENT] Intentando conectar a {ip}:1234");
                     await gameClient.StartClientMode();
+                    Console.WriteLine("[CLIENT] Conectado correctamente al servidor principal");
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine($"[UI] Error iniciando cliente: {ex.Message}");
+                    MessageBox.Show(
+                        $"No se pudo conectar al servidor: {ex.Message}",
+                        "Error de conexión",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Error
+                    );
                 }
             });
         }

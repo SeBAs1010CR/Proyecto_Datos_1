@@ -18,7 +18,50 @@ class Server
     private const int player1Port = 1665;
     private const int player2Port = 1666;
 
-    private static GameController game = new GameController(); // Instancia única del juego
+    private static GameController game = new GameController();
+
+    // ---- Added: helpers to allow starting the server from the UI ----
+    private static bool _mainServerStarted = false;
+    private static readonly object _startLock = new object();
+
+    /// <summary>
+    /// Public accessor to the main server port (read-only).
+    /// </summary>
+    public static int MainServerPort => MainPort;
+
+    /// <summary>
+    /// Returns whether the main server has been started.
+    /// </summary>
+    public static bool IsMainServerRunning => _mainServerStarted;
+
+    /// <summary>
+    /// Ensures the main server and game servers are started (safe to call multiple times).
+    /// This method launches the internal async servers on background Tasks.
+    /// </summary>
+    public static void EnsureMainServerStarted()
+    {
+        lock (_startLock)
+        {
+            if (_mainServerStarted) return;
+            _mainServerStarted = true;
+
+            try
+            {
+                // Start main server and two game servers in background tasks
+                _ = Task.Run(() => StartMainServer());
+                _ = Task.Run(() => StartGameServer(player1Port, "Jugador 1"));
+                _ = Task.Run(() => StartGameServer(player2Port, "Jugador 2"));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[SERVER] Error iniciando servidores: {ex.Message}");
+                _mainServerStarted = false;
+            }
+        }
+    }
+
+    // ---- end added helpers ----
+
     private static readonly ConcurrentDictionary<string, StreamWriter> gameClients =
         new ConcurrentDictionary<string, StreamWriter>();
 
@@ -276,7 +319,6 @@ class Server
         }
     }
 
-    // Enviar un mensaje solo a un cliente específico
     private static async Task SendToClient(string playerName, MensajeJuego update)
     {
         try

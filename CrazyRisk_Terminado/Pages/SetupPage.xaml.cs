@@ -1,5 +1,6 @@
 #nullable enable
-﻿using System.Windows;
+using System;
+using System.Windows;
 using System.Windows.Controls;
 using CrazyRisk.Models;
 
@@ -26,6 +27,33 @@ namespace CrazyRisk.Pages
             string ip = txtIP.Text;
             int tropas = int.TryParse(txtTropas.Text, out int t) ? t : 40;
 
+            if (esServidor)
+            {
+                try
+                {
+                    // Iniciar los servidores principales y de juego solo si somos el host
+                    Server.EnsureMainServerStarted();
+
+                    // Mostrar mensaje informativo
+                    MessageBox.Show(
+                        $"Servidor iniciado en puerto {Server.MainServerPort}",
+                        "Servidor",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Information
+                    );
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(
+                        $"Error iniciando servidor: {ex.Message}",
+                        "Error",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Error
+                    );
+                }
+            }
+
+            // Navegar al lobby
             mainFrame.Navigate(new LobbyPage(mainFrame, esServidor, alias, ip, tropas));
         }
 
