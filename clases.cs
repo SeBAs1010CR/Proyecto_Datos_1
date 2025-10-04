@@ -1,5 +1,17 @@
+#nullable enable
+using CrazyRisk.Models;
+using System;
+using System.Linq;
 namespace CrazyRisk.Models
 {
+    public enum EtapaTurno
+    {
+        Refuerzo,
+        Ataque,
+        Movimiento,
+        Final
+    }
+
     public class Jugador
     {
         public string Alias { get; set; }
