@@ -1,6 +1,11 @@
 using CrazyRisk.Models;
 using System;
+
 #nullable enable
+
+// ===========================================
+// Clase Nodo<T>
+// ===========================================
 public class Nodo<T>
 {
     public T Valor { get; set; }
@@ -13,15 +18,23 @@ public class Nodo<T>
     }
 }
 
+// ===========================================
+// Clase Lista<T> - Lista enlazada genérica
+// ===========================================
 public class Lista<T>
 {
     private Nodo<T>? cabeza;
 
+    // ------------------------------
+    // Agregar un elemento al final
+    // ------------------------------
     public void Agregar(T valor)
     {
         Nodo<T> nuevo = new Nodo<T>(valor);
         if (cabeza == null)
+        {
             cabeza = nuevo;
+        }
         else
         {
             Nodo<T> actual = cabeza;
@@ -31,20 +44,22 @@ public class Lista<T>
         }
     }
 
-    
-    //Sebas
+    // ------------------------------
+    // Sacar del frente (como una cola)
+    // ------------------------------
     public T SacarDelFrente()
     {
         if (cabeza == null)
-        {
-            // Opcional: Lanza una excepción si la lista está vacía.
             throw new InvalidOperationException("La lista está vacía.");
-        }
 
         T valorFrente = cabeza.Valor;
-        cabeza = cabeza.Siguiente; // Mueve la cabeza al siguiente nodo (elimina el original)
+        cabeza = cabeza.Siguiente;
         return valorFrente;
     }
+
+    // ------------------------------
+    // Obtener el tamaño de la lista
+    // ------------------------------
     public int ObtenerTamaño()
     {
         int count = 0;
@@ -56,45 +71,51 @@ public class Lista<T>
         }
         return count;
     }
+
+    // ------------------------------
+    // Remover un valor específico
+    // ------------------------------
     public bool Remover(T valor)
     {
         if (cabeza == null) return false;
 
-        // Caso 1: El elemento a remover es la cabeza.
-        if (cabeza.Valor!.Equals(valor)) // Usar Equals para comparar objetos T
+        // Caso 1: el valor está en la cabeza
+        if (cabeza.Valor!.Equals(valor))
         {
             cabeza = cabeza.Siguiente;
             return true;
         }
 
-        // Caso 2: El elemento está en el medio o al final.
+        // Caso 2: está más adelante
         Nodo<T>? actual = cabeza;
         while (actual.Siguiente != null)
         {
             if (actual.Siguiente.Valor!.Equals(valor))
             {
-                // Encontrado: el actual.Siguiente es el nodo a eliminar.
-                actual.Siguiente = actual.Siguiente.Siguiente; // Salta el nodo a remover
+                actual.Siguiente = actual.Siguiente.Siguiente;
                 return true;
             }
             actual = actual.Siguiente;
         }
-        return false; // Valor no encontrado.
+        return false;
     }
 
-    //Método para aleatorizar la lista.
-    public void Aleatorio()
+    // ------------------------------
+    // Verificar si la lista está vacía
+    // ------------------------------
+    public bool EstaVacia() => cabeza == null;
+
+    // ------------------------------
+    // Obtener referencia a la cabeza
+    // ------------------------------
+    public Nodo<T>? ObtenerCabeza() => cabeza;
+
+    // ------------------------------
+    // Convertir lista a arreglo
+    // ------------------------------
+    public T[] ConvertirAArray()
     {
-        if (cabeza == null || cabeza.Siguiente == null)
-        {
-            return; // No hay nada que barajar o solo hay un elemento.
-        }
-
         int tamaño = ObtenerTamaño();
-
-        // 1. EXTRAER: Mover todos los valores a un arreglo.
-        // NOTA: Usamos el arreglo de C# como herramienta de proceso,
-        // no como estructura de datos principal.
         T[] elementos = new T[tamaño];
         Nodo<T>? actual = cabeza;
         for (int i = 0; i < tamaño; i++)
@@ -102,33 +123,83 @@ public class Lista<T>
             elementos[i] = actual!.Valor;
             actual = actual.Siguiente;
         }
-
-        // 2. BARAJAR (Algoritmo Fisher-Yates)
-        // Este algoritmo es eficiente para la aleatorización.
-        Random random = new Random();
-        for (int i = tamaño - 1; i > 0; i--)
-        {
-            // Elige un índice aleatorio 'j' antes del actual 'i'
-            int j = random.Next(0, i + 1);
-
-            // Intercambiar elementos[i] y elementos[j]
-            T temp = elementos[i];
-            elementos[i] = elementos[j];
-            elementos[j] = temp;
-        }
-
-        // 3. RECONSTRUIR: Reemplazar los valores de la lista enlazada con el orden aleatorio.
-        cabeza = null; // Borramos la lista existente
-
-        // Recorremos el arreglo barajado y reconstruimos la lista
-        for (int i = 0; i < tamaño; i++)
-        {
-            Agregar(elementos[i]);
-        }
+        return elementos;
     }
-    public bool EstaVacia() => cabeza == null;
 
-    public Nodo<T>? ObtenerCabeza() => cabeza;
+    // ------------------------------
+    // Seleccionar un elemento aleatorio
+    // ------------------------------
+    public T SeleccionarAleatorio()
+    {
+        if (EstaVacia())
+            throw new InvalidOperationException("La lista está vacía.");
+
+        int tamaño = ObtenerTamaño();
+        Random random = new Random();
+        int indice = random.Next(0, tamaño);
+
+        Nodo<T>? actual = cabeza;
+        for (int i = 0; i < indice; i++)
+            actual = actual!.Siguiente;
+
+        return actual!.Valor;
+    }
+
+    // ------------------------------
+    // Barajar los elementos de la lista
+    // ------------------------------
+    public void Aleatorio()
+    {
+        if (cabeza == null || cabeza.Siguiente == null)
+            return;
+
+        T[] elementos = ConvertirAArray();
+
+        Random random = new Random();
+        for (int i = elementos.Length - 1; i > 0; i--)
+        {
+            int j = random.Next(0, i + 1);
+            (elementos[i], elementos[j]) = (elementos[j], elementos[i]);
+        }
+
+        cabeza = null;
+        foreach (var e in elementos)
+            Agregar(e);
+    }
+
+    // ------------------------------
+    // Verificar si contiene un valor
+    // ------------------------------
+    public bool Contiene(T valor)
+    {
+        var actual = cabeza;
+        while (actual != null)
+        {
+            if (actual.Valor!.Equals(valor))
+                return true;
+            actual = actual.Siguiente;
+        }
+        return false;
+    }
 }
 
+// ===========================================
+// Clase Cola<T> - Implementa una cola simple
+// ===========================================
+public class Cola<T>
+{
+    private Lista<T> elementos = new Lista<T>();
 
+    public void Encolar(T valor) => elementos.Agregar(valor);
+
+    public T Desencolar()
+    {
+        if (elementos.EstaVacia())
+            throw new InvalidOperationException("La cola está vacía.");
+        return elementos.SacarDelFrente();
+    }
+
+    public bool EstaVacia() => elementos.EstaVacia();
+
+    public int ObtenerTamaño() => elementos.ObtenerTamaño();
+}
