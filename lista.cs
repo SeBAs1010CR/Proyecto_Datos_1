@@ -128,7 +128,7 @@ public class Lista<T>
     public Nodo<T>? ObtenerCabeza() => cabeza;
     
     
-// ✅ Nuevo: Convertir a arreglo
+//  Convertir a arreglo
     public T[] ConvertirAArray()
     {
         int tamaño = ObtenerTamaño();
@@ -142,7 +142,7 @@ public class Lista<T>
         return elementos;
     }
 
-    // ✅ Nuevo: Seleccionar elemento aleatorio
+    //  Seleccionar elemento aleatorio
     public T SeleccionarAleatorio()
     {
         if (EstaVacia())
@@ -159,7 +159,7 @@ public class Lista<T>
         return actual!.Valor;
     }
 
-    // ✅ Nuevo: Barajar lista (ya tienes Aleatorio, lo dejamos igual)
+    //Barajar lista (ya tenemos Aleatorio, lo dejamos igual)
     public void Aleatorio()
     {
         if (cabeza == null || cabeza.Siguiente == null)
