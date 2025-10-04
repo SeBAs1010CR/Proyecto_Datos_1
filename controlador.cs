@@ -8,11 +8,11 @@ namespace CrazyRisk.ViewModels
         public Mapa Mapa { get; private set; }
         public Jugador Jugador1 { get; private set; }
         public Jugador Jugador2 { get; private set; }
-        // Contador para seguir la secuencia de refuerzo: 1er intercambio = 2, 2do = 3, etc.
-
+        
         public Jugador Neutro { get; private set; } //jugador neutro que hice para los territorios, atte dilan
         public EtapaTurno EtapaActual { get; private set; } = EtapaTurno.Refuerzo;
         private int ContadorGlobalIntercambios = 1;
+        // Contador para seguir la secuencia de refuerzo: 1er intercambio = 2, 2do = 3, etc.
 
         public Jugador Actual { get; private set; } = null!;
 
