@@ -94,11 +94,10 @@ class Server
         return defaultValue;
     }
 
-    public static async Task Main(string[] args)
+    public static async Task StartServersAsync()
     {
         Console.WriteLine("[SERVER] Iniciando servidores...");
 
-        // Inicia servidor principal (lobby) y servidores de juego
         var mainTask = StartMainServer();
         var p1Task = StartGameServer(player1Port, "Jugador 1");
         var p2Task = StartGameServer(player2Port, "Jugador 2");
