@@ -84,12 +84,24 @@ namespace CrazyRisk.ViewModels
             // - Un arreglo con los nombres de los territorios que lo componen
             var continentes = new Dictionary<string, (int bonus, string[] territorios)>
             {
-                { "América del Norte", (5, new[] { "Alaska", "Territorio del Noroeste", "Groenlandia", "Alberta", "Ontario", "Quebec", "Oeste de EE.UU.", "Este de EE.UU.", "México" }) },
-                { "América del Sur", (2, new[] { "Venezuela", "Perú", "Brasil", "Argentina" }) },
-                { "Europa", (5, new[] { "Islandia", "Escandinavia", "Gran Bretaña", "Europa Occidental", "Europa del Sur", "Europa del Norte", "Ucrania" }) },
-                { "África", (3, new[] { "África del Norte", "Egipto", "Congo", "África Oriental", "África del Sur", "Madagascar" }) },
-                { "Asia", (7, new[] { "Ural", "Siberia", "Yakutsk", "Kamchatka", "Irkutsk", "Mongolia", "Japón", "China", "India", "Afganistán", "Medio Oriente", "Siam" }) },
-                { "Oceanía", (2, new[] { "Indonesia", "Nueva Guinea", "Australia Occidental", "Australia Oriental" }) }
+                { "América", (5, new[] {
+                    "Estados_Unidos", "Canada", "Alaska", "Mexico", "Guatemala", "Belice", "El_Salvador", "Honduras",
+                    "Nicaragua", "Costa_Rica", "Panama", "Colombia", "Venezuela", "Ecuador", "Peru", "Brasil",
+                    "Guyana_Francesa", "Guyana", "Suriname", "Bolivia", "Paraguay", "Chile", "Argentina", "Uruguay",
+                    "Cuba", "Jamaica", "Haiti", "Republica_Dominicana", "Puerto_Rico"
+                }) },
+                { "Europa", (8, new[] {
+                    "Dinamarca", "Islandia", "Italia", "Alemania", "Turquia"
+                }) },
+                { "Asia", (7, new[] {
+                    "Rusia", "China", "Indonesia", "Mongolia", "India", "Arabia_Saudita", "Nepal"
+                }) },
+                { "Oceanía", (2, new[] {
+                    "Australia"
+                }) },
+                { "África", (3, new[] {
+                    "Nigeria", "Sudafrica"
+                }) }
             };
 
             int bonus = 0; // Acumulador para el total de tropas extra
