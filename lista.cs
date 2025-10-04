@@ -126,9 +126,9 @@ public class Lista<T>
     public bool EstaVacia() => cabeza == null;
 
     public Nodo<T>? ObtenerCabeza() => cabeza;
-    
-    
-//  Convertir a arreglo
+
+
+    //  Convertir a arreglo
     public T[] ConvertirAArray()
     {
         int tamaño = ObtenerTamaño();
@@ -180,8 +180,36 @@ public class Lista<T>
         foreach (var e in elementos)
             Agregar(e);
     }
+    public bool Contiene(T valor)
+    {
+        var actual = cabeza;
+        while (actual != null)
+        {
+            if (actual.Valor!.Equals(valor))
+                return true;
+            actual = actual.Siguiente;
+        }
+        return false;
+    }
+    
 }
+public class Cola<T>
+{
+    private Lista<T> elementos = new Lista<T>();
 
+    public void Encolar(T valor) => elementos.Agregar(valor);
+
+    public T Desencolar()
+    {
+        if (elementos.EstaVacia())
+            throw new InvalidOperationException("La cola está vacía.");
+        return elementos.SacarDelFrente();
+    }
+
+    public bool EstaVacia() => elementos.EstaVacia();
+
+    public int ObtenerTamaño() => elementos.ObtenerTamaño();
+}
 
 
 
