@@ -132,7 +132,7 @@ namespace CrazyRisk.ViewModels
         }
 
 
-
+        //funcion que verifica si es adyacente
         public bool EsAdyacente(Territorio a, Territorio b)
         {
             var actual = a.Adyacentes.ObtenerCabeza();
@@ -174,7 +174,7 @@ namespace CrazyRisk.ViewModels
         //DILAN
         {
             //  lista de 42 territorios con sus continentes
-            var territorios = new List<Territorio>
+            var territorios = new Lista<Territorio>
             {
                 new Territorio("Estados_Unidos", "America"),
                 new Territorio("Canada", "America"),
@@ -223,8 +223,7 @@ namespace CrazyRisk.ViewModels
                 new Territorio("TEC", "Especial")
             };
             // 2. Mezclar aleatoriamente
-            var random = new Random();
-            territorios = territorios.OrderBy(t => random.Next()).ToList();
+            territorios.Aleatorio();
 
             // 3. Repartir entre Jugador1, Jugador2 y Neutro
             int index = 0;
@@ -454,17 +453,15 @@ namespace CrazyRisk.ViewModels
         // Selecciona un territorio aleatorio del jugador
         private Territorio SeleccionarTerritorioAleatorio(Jugador jugador)
         {
-            var territorios = new List<Territorio>();
+            var territorios = new Lista<Territorio>();
             var nodo = Mapa.Territorios.ObtenerCabeza();
             while (nodo != null)
             {
                 if (nodo.Valor.Dueño == jugador)
-                    territorios.Add(nodo.Valor);
+                    territorios.Agregar(nodo.Valor);
                 nodo = nodo.Siguiente;
             }
-
-            var rand = new Random();
-            return territorios[rand.Next(territorios.Count)];
+            return territorios.SeleccionarAleatorio();
         }
         public bool EsTrioValido(Lista<Tarjeta> trio)
         {
@@ -725,41 +722,27 @@ namespace CrazyRisk.ViewModels
         public void DistribuirTropasNeutro()
         {
             int restantes = 40 - ContarTerritorios(Neutro);
-            var territoriosNeutros = new List<Territorio>();
+            var territoriosNeutros = new Lista<Territorio>();
+
             var nodo = Mapa.Territorios.ObtenerCabeza();
             while (nodo != null)
             {
                 if (nodo.Valor.Dueño == Neutro)
-                    territoriosNeutros.Add(nodo.Valor);
+                    territoriosNeutros.Agregar(nodo.Valor);
                 nodo = nodo.Siguiente;
             }
 
-            var rand = new Random();
             while (restantes > 0)
             {
-                var territorio = territoriosNeutros[rand.Next(territoriosNeutros.Count)];
+                var territorio = territoriosNeutros.SeleccionarAleatorio(); // Usa tu método nuevo
                 territorio.Tropas++;
                 restantes--;
             }
         }
-
         // Baraja el mazo de tarjetas manualmente
         public void BarajarMazo()
         {
-            var tarjetas = new List<Tarjeta>();
-            var nodo = MazoDeTarjetas.ObtenerCabeza();
-            while (nodo != null)
-            {
-                tarjetas.Add(nodo.Valor);
-                nodo = nodo.Siguiente;
-            }
-
-            var rand = new Random();
-            tarjetas = tarjetas.OrderBy(t => rand.Next()).ToList();
-
-            MazoDeTarjetas = new Lista<Tarjeta>();
-            foreach (var tarjeta in tarjetas)
-                MazoDeTarjetas.Agregar(tarjeta);
+            MazoDeTarjetas.Aleatorio();
         }
 
         // Asigna tarjeta con nombre del territorio (opcional)
